@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BABI SHIP — Calculez votre prix</title>
+<meta name="description" content="Envoi de colis entre la France et Abidjan. Prix ferme, tout compris, en 3 taps.">
+<meta name="theme-color" content="#0B6E4F">
+<style>
+  :root {
+    --vert: #0B6E4F;
+    --vert-fonce: #084D38;
+    --vert-clair: #E6F2EC;
+    --orange: #F28C28;
+    --texte: #14201B;
+    --doux: #55635C;
+    --fond: #F7F5F0;
+    --carte: #FFFFFF;
+    --bord: #DAD6CC;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.45;
+    color: var(--texte);
+    background: var(--fond);
+  }
+  .page { max-width: 480px; margin: 0 auto; padding: 0 16px 40px; }
+  header { padding: 20px 0 8px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-weight: 800; font-size: 22px; letter-spacing: .5px; color: var(--vert); }
+  .logo span { color: var(--orange); }
+  .badge { font-size: 13px; font-weight: 600; color: var(--doux); border: 1px solid var(--bord); border-radius: 999px; padding: 4px 10px; background: var(--carte); }
+  h1 { font-size: 26px; line-height: 1.2; margin: 16px 0 6px; }
+  .accroche { color: var(--doux); margin: 0 0 24px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  .num { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; background: var(--vert); color: #fff; font-size: 14px; align-items: center; justify-content: center; margin-right: 8px; }
+  .grille { display: grid; gap: 10px; }
+  .deux { grid-template-columns: 1fr 1fr; }
+  .tuile {
+    min-height: 56px; width: 100%;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; text-align: left;
+    font: inherit; font-size: 17px; color: var(--texte);
+    background: var(--carte); border: 2px solid var(--bord); border-radius: 14px;
+    cursor: pointer;
+  }
+  .tuile:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+  .tuile[aria-pressed="true"] { border-color: var(--vert); background: var(--vert-clair); }
+  .tuile .ico { font-size: 28px; line-height: 1; flex: none; }
+  .tuile small { display: block; color: var(--doux); font-size: 14px; }
+  .sens { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .sens b { font-size: 18px; }
+  .resultat {
+    margin-top: 28px; padding: 20px;
+    background: var(--vert); color: #fff; border-radius: 18px;
+  }
+  .resultat .etiquette { font-size: 15px; opacity: .85; margin: 0; }
+  .prix { font-size: 40px; font-weight: 800; line-height: 1.1; margin: 4px 0 2px; }
+  .inclus { font-size: 15px; opacity: .9; margin: 0 0 14px; }
+  .date { background: rgba(255,255,255,.14); border-radius: 12px; padding: 12px 14px; margin: 0; }
+  .date b { display: block; font-size: 19px; }
+  .devis { background: var(--carte); color: var(--texte); border: 2px dashed var(--orange); }
+  .devis .etiquette { color: var(--doux); opacity: 1; }
+  .attente { background: var(--carte); color: var(--doux); border: 2px solid var(--bord); text-align: center; }
+  .bouton {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 56px; width: 100%; margin-top: 14px;
+    font: inherit; font-weight: 700; font-size: 17px;
+    color: var(--vert-fonce); background: #fff; border: none; border-radius: 14px;
+    cursor: pointer;
+  }
+  .bouton:disabled { opacity: .7; cursor: default; }
+  .devis .bouton { background: var(--orange); color: #fff; }
+  .note { font-size: 14px; color: var(--doux); margin-top: 24px; }
+  footer { margin-top: 32px; font-size: 14px; color: var(--doux); text-align: center; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="logo">BABI<span>SHIP</span></div>
+    <div class="badge">Démo</div>
+  </header>
+
+  <h1>Envoyez un colis entre la France et Abidjan</h1>
+  <p class="accroche">Prix ferme, tout compris. Collecte chez vous.</p>
+
+  <h2><span class="num">1</span>Dans quel sens ?</h2>
+  <div class="grille deux" id="sens"></div>
+
+  <h2><span class="num">2</span>Quelle taille ?</h2>
+  <div class="grille" id="tailles"></div>
+
+  <div id="resultat" class="resultat attente" aria-live="polite">
+    Choisissez le sens et la taille pour voir votre prix.
+  </div>
+
+  <p class="note">Page de démonstration : tarifs indicatifs, aucun paiement possible.</p>
+  <footer>BABI SHIP · Abidjan ⇄ France</footer>
+</div>
+
+<script>
+  // Tarifs provisoires (À CONFIRMER) — mêmes valeurs que le moteur de prix babiship.
+  var TRAJETS = {
+    "fr-ci": { de: "France", vers: "Abidjan", aVers: "à Abidjan", ico: "🇫🇷 → 🇨🇮", devise: "EUR", fixe: 9, parKg: 8, arrondi: 1, avantDepart: 2, acheminement: 5 },
+    "ci-fr": { de: "Abidjan", vers: "France", aVers: "en France", ico: "🇨🇮 → 🇫🇷", devise: "FCFA", fixe: 6000, parKg: 5500, arrondi: 100, avantDepart: 2, acheminement: 4 }
+  };
+  var TAILLES = [
+    { id: "enveloppe", ico: "✉️", nom: "Une enveloppe, des papiers", kg: 0.5 },
+    { id: "chaussures", ico: "👟", nom: "Une paire de chaussures", kg: 2 },
+    { id: "carton", ico: "📦", nom: "Un carton à chaussures plein", kg: 5 },
+    { id: "cabine", ico: "🧳", nom: "Une valise cabine", kg: 10 },
+    { id: "soute", ico: "🧳", nom: "Une grande valise", kg: 23 },
+    { id: "plus", ico: "🚚", nom: "Plus gros", kg: null }
+  ];
+
+  var choix = { sens: null, taille: null };
+
+  function jourOuvre(d) { var j = d.getDay(); return j !== 0 && j !== 6; }
+  function ajouterJoursOuvres(date, n) {
+    var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    while (n > 0) { d.setDate(d.getDate() + 1); if (jourOuvre(d)) n--; }
+    return d;
+  }
+  function formatDate(d) {
+    return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  }
+  function formatPrix(montant, devise) {
+    var n = montant.toLocaleString("fr-FR").replace(/ | /g, " ");
+    return devise === "EUR" ? n + " €" : n + " FCFA";
+  }
+
+  // Prix et date calculés une seule fois pour un choix donné.
+  function calculer(t, taille) {
+    var brut = t.fixe + t.parKg * taille.kg;
+    var prix = Math.ceil(brut / t.arrondi) * t.arrondi;
+    var depart = ajouterJoursOuvres(new Date(), t.avantDepart);
+    var livraison = ajouterJoursOuvres(depart, t.acheminement);
+    return { prix: prix, livraison: livraison };
+  }
+
+  function bouton(conteneur, html, actif, auClic, classe) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "tuile" + (classe ? " " + classe : "");
+    b.setAttribute("aria-pressed", actif ? "true" : "false");
+    b.innerHTML = html;
+    b.addEventListener("click", auClic);
+    conteneur.appendChild(b);
+  }
+
+  function afficher() {
+    var s = document.getElementById("sens");
+    s.innerHTML = "";
+    Object.keys(TRAJETS).forEach(function (id) {
+      var t = TRAJETS[id];
+      bouton(s, '<span class="ico">' + t.ico + '</span><b>' + t.de + ' → ' + t.vers + '</b>',
+        choix.sens === id, function () { choix.sens = id; afficher(); }, "sens");
+    });
+
+    var g = document.getElementById("tailles");
+    g.innerHTML = "";
+    TAILLES.forEach(function (x) {
+      var detail = x.kg ? "jusqu'à " + String(x.kg).replace(".", ",") + " kg" : "déménagement, marchandises";
+      bouton(g, '<span class="ico">' + x.ico + '</span><span>' + x.nom + '<small>' + detail + '</small></span>',
+        choix.taille === x.id, function () { choix.taille = x.id; afficher(); });
+    });
+
+    var r = document.getElementById("resultat");
+    if (!choix.sens || !choix.taille) {
+      r.className = "resultat attente";
+      r.textContent = "Choisissez le sens et la taille pour voir votre prix.";
+      return;
+    }
+    var t = TRAJETS[choix.sens];
+    var taille = TAILLES.filter(function (x) { return x.id === choix.taille; })[0];
+    if (!taille.kg) {
+      r.className = "resultat devis";
+      r.innerHTML = '<p class="etiquette">' + t.de + ' → ' + t.vers + '</p>' +
+        '<p class="prix" style="font-size:26px">Sur devis</p>' +
+        '<p class="inclus" style="opacity:1">Nous vous répondons sur WhatsApp sous 2 heures ouvrées.</p>' +
+        '<button class="bouton" type="button" disabled>Demander un devis (bientôt)</button>';
+      return;
+    }
+    var res = calculer(t, taille);
+    r.className = "resultat";
+    r.innerHTML = '<p class="etiquette">' + t.de + ' → ' + t.vers + ' · ' + taille.nom.toLowerCase() + '</p>' +
+      '<p class="prix" id="prix">' + formatPrix(res.prix, t.devise) + '</p>' +
+      '<p class="inclus">Prix ferme, tout compris : collecte, transport, livraison.</p>' +
+      '<p class="date">Livré ' + t.aVers + ' le<b id="date">' + formatDate(res.livraison) + '</b></p>' +
+      '<button class="bouton" type="button" disabled>Envoyer mon colis (bientôt)</button>';
+  }
+
+  afficher();
+</script>
+</body>
+</html>
