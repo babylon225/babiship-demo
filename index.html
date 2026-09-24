@@ -1,199 +1,327 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BABI SHIP — Calculez votre prix</title>
-<meta name="description" content="Envoi de colis entre la France et Abidjan. Prix ferme, tout compris, en 3 taps.">
-<meta name="theme-color" content="#0B6E4F">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BABI SHIP — Envoyez un colis entre la France et Abidjan</title>
+<meta name="description" content="Envoyez un colis entre la France et la Côte d'Ivoire. Prix ferme tout compris en 10 secondes, collecte à domicile, suivi sur WhatsApp.">
 <style>
-  :root {
-    --vert: #0B6E4F;
-    --vert-fonce: #084D38;
-    --vert-clair: #E6F2EC;
-    --orange: #F28C28;
-    --texte: #14201B;
-    --doux: #55635C;
-    --fond: #F7F5F0;
-    --carte: #FFFFFF;
-    --bord: #DAD6CC;
+:root{
+  --vert:#0d6b45;
+  --vert-fonce:#08502f;
+  --vert-clair:#e6f4ed;
+  --fond:#ffffff;
+  --fond-2:#f6f8f7;
+  --texte:#14201a;
+  --texte-doux:#5a6b62;
+  --bord:#dde5e1;
+  --ombre:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.05);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --vert:#2f9d70;--vert-fonce:#247a57;--vert-clair:#12271e;
+    --fond:#0e1512;--fond-2:#141d19;--texte:#eef4f1;--texte-doux:#9db0a6;--bord:#26332c;
+    --ombre:0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
   }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; }
-  body {
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    font-size: 17px;
-    line-height: 1.45;
-    color: var(--texte);
-    background: var(--fond);
-  }
-  .page { max-width: 480px; margin: 0 auto; padding: 0 16px 40px; }
-  header { padding: 20px 0 8px; display: flex; align-items: center; justify-content: space-between; }
-  .logo { font-weight: 800; font-size: 22px; letter-spacing: .5px; color: var(--vert); }
-  .logo span { color: var(--orange); }
-  .badge { font-size: 13px; font-weight: 600; color: var(--doux); border: 1px solid var(--bord); border-radius: 999px; padding: 4px 10px; background: var(--carte); }
-  h1 { font-size: 26px; line-height: 1.2; margin: 16px 0 6px; }
-  .accroche { color: var(--doux); margin: 0 0 24px; }
-  h2 { font-size: 17px; margin: 28px 0 10px; }
-  .num { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; background: var(--vert); color: #fff; font-size: 14px; align-items: center; justify-content: center; margin-right: 8px; }
-  .grille { display: grid; gap: 10px; }
-  .deux { grid-template-columns: 1fr 1fr; }
-  .tuile {
-    min-height: 56px; width: 100%;
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 14px; text-align: left;
-    font: inherit; font-size: 17px; color: var(--texte);
-    background: var(--carte); border: 2px solid var(--bord); border-radius: 14px;
-    cursor: pointer;
-  }
-  .tuile:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
-  .tuile[aria-pressed="true"] { border-color: var(--vert); background: var(--vert-clair); }
-  .tuile .ico { font-size: 28px; line-height: 1; flex: none; }
-  .tuile small { display: block; color: var(--doux); font-size: 14px; }
-  .sens { flex-direction: column; align-items: flex-start; gap: 4px; }
-  .sens b { font-size: 18px; }
-  .resultat {
-    margin-top: 28px; padding: 20px;
-    background: var(--vert); color: #fff; border-radius: 18px;
-  }
-  .resultat .etiquette { font-size: 15px; opacity: .85; margin: 0; }
-  .prix { font-size: 40px; font-weight: 800; line-height: 1.1; margin: 4px 0 2px; }
-  .inclus { font-size: 15px; opacity: .9; margin: 0 0 14px; }
-  .date { background: rgba(255,255,255,.14); border-radius: 12px; padding: 12px 14px; margin: 0; }
-  .date b { display: block; font-size: 19px; }
-  .devis { background: var(--carte); color: var(--texte); border: 2px dashed var(--orange); }
-  .devis .etiquette { color: var(--doux); opacity: 1; }
-  .attente { background: var(--carte); color: var(--doux); border: 2px solid var(--bord); text-align: center; }
-  .bouton {
-    display: flex; align-items: center; justify-content: center;
-    min-height: 56px; width: 100%; margin-top: 14px;
-    font: inherit; font-weight: 700; font-size: 17px;
-    color: var(--vert-fonce); background: #fff; border: none; border-radius: 14px;
-    cursor: pointer;
-  }
-  .bouton:disabled { opacity: .7; cursor: default; }
-  .devis .bouton { background: var(--orange); color: #fff; }
-  .note { font-size: 14px; color: var(--doux); margin-top: 24px; }
-  footer { margin-top: 32px; font-size: 14px; color: var(--doux); text-align: center; }
+}
+:root[data-theme="dark"]{
+  --vert:#2f9d70;--vert-fonce:#247a57;--vert-clair:#12271e;
+  --fond:#0e1512;--fond-2:#141d19;--texte:#eef4f1;--texte-doux:#9db0a6;--bord:#26332c;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 12px);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--fond);color:var(--texte);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+.wrap{width:100%;max-width:760px;margin:0 auto;padding:0 20px}
+
+/* En-tête */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--fond);border-bottom:1px solid var(--bord)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-weight:800;letter-spacing:.06em;color:var(--vert);font-size:18px;text-decoration:none}
+.lien-suivi{color:var(--texte);text-decoration:none;font-weight:600;font-size:15px;padding:10px 14px;border:1px solid var(--bord);border-radius:10px}
+
+/* Hero */
+.hero{padding:34px 0 8px}
+h1{font-size:32px;line-height:1.2;margin:0 0 12px;letter-spacing:-.02em}
+.chapo{color:var(--texte-doux);margin:0 0 22px;font-size:17px}
+.puces{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px;padding:0;list-style:none}
+.puces li{font-size:14px;font-weight:600;background:var(--vert-clair);color:var(--vert);padding:7px 12px;border-radius:999px}
+
+/* Calculateur */
+.calc{background:var(--fond-2);border:1px solid var(--bord);border-radius:18px;padding:20px;box-shadow:var(--ombre)}
+.calc h2{margin:0 0 4px;font-size:20px}
+.calc .sous{margin:0 0 18px;color:var(--texte-doux);font-size:15px}
+.etiquette{display:block;font-weight:700;font-size:15px;margin:0 0 10px}
+.sens{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.opt{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  min-height:72px;padding:12px 8px;border:2px solid var(--bord);border-radius:14px;
+  background:var(--fond);color:var(--texte);cursor:pointer;font:inherit;font-weight:700;font-size:15px;
+  text-align:center;line-height:1.25;
+}
+.opt:hover{border-color:var(--vert)}
+.opt[aria-pressed="true"]{border-color:var(--vert);background:var(--vert-clair);color:var(--vert)}
+.opt .drapeaux{font-size:19px;letter-spacing:2px}
+.tailles{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.taille{
+  display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:12px 14px;
+  border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);
+  cursor:pointer;font:inherit;text-align:left;
+}
+.taille:hover{border-color:var(--vert)}
+.taille[aria-pressed="true"]{border-color:var(--vert);background:var(--vert-clair)}
+.taille .ico{font-size:26px;flex:0 0 auto;width:34px;text-align:center}
+.taille .nom{font-weight:700;font-size:16px;display:block}
+.taille .det{color:var(--texte-doux);font-size:14px}
+.taille[aria-pressed="true"] .det{color:var(--vert)}
+
+.resultat{border-top:1px solid var(--bord);padding-top:20px;margin-top:4px}
+.prix-boite{background:var(--vert);color:#fff;border-radius:16px;padding:20px}
+.prix{font-size:40px;font-weight:800;line-height:1;letter-spacing:-.02em;display:block;margin-bottom:8px}
+.prix-note{font-size:15px;opacity:.92;margin:0}
+.date-boite{background:var(--vert-clair);color:var(--vert);border-radius:14px;padding:14px 16px;margin-top:12px;font-size:15px}
+.date-boite strong{display:block;font-size:17px}
+.btn{
+  display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;
+  border:0;border-radius:14px;background:var(--vert);color:#fff;font:inherit;font-weight:700;font-size:17px;
+  cursor:pointer;margin-top:14px;text-decoration:none;
+}
+.btn:hover{background:var(--vert-fonce)}
+.btn-2{background:transparent;color:var(--vert);border:2px solid var(--vert)}
+.btn-2:hover{background:var(--vert-clair)}
+.attente{color:var(--texte-doux);font-size:15px;text-align:center;padding:18px 0 4px;margin:0}
+.devis{background:var(--fond);border:2px dashed var(--bord);border-radius:16px;padding:20px;text-align:center}
+.devis p{margin:0 0 4px;font-weight:700;font-size:17px}
+.devis span{color:var(--texte-doux);font-size:15px}
+
+/* Sections */
+section{padding:40px 0}
+h2.titre{font-size:24px;margin:0 0 18px;letter-spacing:-.01em}
+.etapes{list-style:none;margin:0;padding:0;counter-reset:e}
+.etapes li{counter-increment:e;display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--bord)}
+.etapes li:last-child{border-bottom:0}
+.etapes li::before{
+  content:counter(e);flex:0 0 auto;width:32px;height:32px;border-radius:50%;
+  background:var(--vert-clair);color:var(--vert);font-weight:800;font-size:15px;
+  display:flex;align-items:center;justify-content:center;
+}
+.etapes b{display:block;font-size:16px}
+.etapes span{color:var(--texte-doux);font-size:15px}
+
+.cartes{display:grid;gap:12px}
+.carte{background:var(--fond-2);border:1px solid var(--bord);border-radius:14px;padding:16px}
+.carte b{display:block;margin-bottom:4px;font-size:16px}
+.carte span{color:var(--texte-doux);font-size:15px}
+
+.marques{background:var(--vert-clair);border-radius:18px;padding:24px}
+.marques h2{margin-top:0;color:var(--vert)}
+.marques p{color:var(--texte);margin:0 0 16px}
+
+.liens{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;list-style:none}
+.liens a{
+  display:inline-block;font-size:14px;color:var(--texte-doux);text-decoration:none;
+  border:1px solid var(--bord);border-radius:999px;padding:8px 13px;
+}
+.liens a:hover{border-color:var(--vert);color:var(--vert)}
+
+details{border-bottom:1px solid var(--bord);padding:14px 0}
+summary{font-weight:700;cursor:pointer;font-size:16px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";float:right;color:var(--vert);font-weight:800}
+details[open] summary::after{content:"–"}
+details p{color:var(--texte-doux);margin:10px 0 0;font-size:15px}
+
+footer{border-top:1px solid var(--bord);padding:26px 0 40px;color:var(--texte-doux);font-size:14px}
+.avert{background:#fff8e6;border:1px solid #f0dca8;color:#6b5312;border-radius:12px;padding:12px 14px;font-size:14px;margin-top:18px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .avert{background:#2a2412;border-color:#4d411c;color:#e6d39a}}
+@media (min-width:620px){
+  h1{font-size:40px}
+  .cartes{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
-<div class="page">
-  <header>
-    <div class="logo">BABI<span>SHIP</span></div>
-    <div class="badge">Démo</div>
-  </header>
 
-  <h1>Envoyez un colis entre la France et Abidjan</h1>
-  <p class="accroche">Prix ferme, tout compris. Collecte chez vous.</p>
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="#">BABI SHIP</a>
+    <a class="lien-suivi" href="#suivi">Suivre un colis</a>
+  </div>
+</header>
 
-  <h2><span class="num">1</span>Dans quel sens ?</h2>
-  <div class="grille deux" id="sens"></div>
+<main>
+<div class="wrap">
 
-  <h2><span class="num">2</span>Quelle taille ?</h2>
-  <div class="grille" id="tailles"></div>
-
-  <div id="resultat" class="resultat attente" aria-live="polite">
-    Choisissez le sens et la taille pour voir votre prix.
+  <div class="hero">
+    <h1>Envoyez un colis entre la France et Abidjan</h1>
+    <p class="chapo">Prix ferme, tout compris. Collecte à domicile. Suivi sur WhatsApp. Sans créer de compte.</p>
+    <ul class="puces">
+      <li>Prix tout compris</li>
+      <li>Collecte incluse</li>
+      <li>Suivi WhatsApp</li>
+      <li>Sans compte</li>
+    </ul>
   </div>
 
-  <p class="note">Page de démonstration : tarifs indicatifs, aucun paiement possible.</p>
-  <footer>BABI SHIP · Abidjan ⇄ France</footer>
+  <div class="calc">
+    <h2>Calculez votre prix</h2>
+    <p class="sous">Deux questions, votre prix s'affiche.</p>
+
+    <span class="etiquette">1. Dans quel sens ?</span>
+    <div class="sens">
+      <button class="opt" type="button" data-sens="fr" aria-pressed="true">
+        <span class="drapeaux">🇫🇷 → 🇨🇮</span>
+        <span>France → Abidjan</span>
+      </button>
+      <button class="opt" type="button" data-sens="ci" aria-pressed="false">
+        <span class="drapeaux">🇨🇮 → 🇫🇷</span>
+        <span>Abidjan → France</span>
+      </button>
+    </div>
+
+    <span class="etiquette">2. C'est gros comme…</span>
+    <div class="tailles" id="tailles"></div>
+
+    <div class="resultat" id="resultat">
+      <p class="attente">Choisissez une taille pour voir votre prix.</p>
+    </div>
+  </div>
+
+  <div class="avert">
+    <strong>Maquette de démonstration.</strong> Les tarifs et délais ci-dessus sont des valeurs d'exemple, à remplacer par votre grille réelle.
+  </div>
+
+  <section>
+    <h2 class="titre">Comment ça marche</h2>
+    <ol class="etapes">
+      <li><span><b>Vous obtenez votre prix</b><span>Deux questions, prix ferme tout compris. Aucun compte à créer.</span></span></li>
+      <li><span><b>Nous venons chercher le colis</b><span>Collecte à domicile incluse, ou dépôt au point BABI SHIP le plus proche.</span></span></li>
+      <li><span><b>Le destinataire indique où livrer</b><span>Il reçoit un lien WhatsApp et pose lui-même son repère sur la carte.</span></span></li>
+      <li><span><b>Vous suivez jusqu'à la remise</b><span>Un seul numéro de suivi, une notification WhatsApp à chaque étape.</span></span></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2 class="titre">Pourquoi BABI SHIP</h2>
+    <div class="cartes">
+      <div class="carte"><b>Le prix affiché est le prix payé</b><span>Rien à régler à la livraison. Aucune surprise pour celui qui reçoit.</span></div>
+      <div class="carte"><b>Pensé pour Abidjan</b><span>Pas besoin d'adresse postale : un repère sur la carte suffit.</span></div>
+      <div class="carte"><b>Tout passe par WhatsApp</b><span>Suivi, collecte, livraison. Pas d'e-mail à surveiller.</span></div>
+      <div class="carte"><b>Preuve à chaque étape</b><span>Photo horodatée à la collecte et à la remise du colis.</span></div>
+    </div>
+  </section>
+
+  <section id="suivi">
+    <div class="marques">
+      <h2 class="titre">Vous vendez depuis Abidjan ?</h2>
+      <p>Continuez à vendre comme aujourd'hui. Nous rendons simplement vos produits livrables en France et en Europe. Vos clients voient le prix de livraison au moment de payer, vous n'avancez rien.</p>
+      <a class="btn" href="#">Devenir marque partenaire</a>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="titre">Questions fréquentes</h2>
+    <details><summary>Combien de temps dure la livraison ?</summary><p>Comptez 6 jours ouvrés de la France vers Abidjan et 7 jours ouvrés d'Abidjan vers la France. La date exacte vous est annoncée avant le paiement.</p></details>
+    <details><summary>Y a-t-il des frais à payer à la livraison ?</summary><p>Non. Le prix affiché au moment de la commande est le prix total. Le destinataire n'a rien à régler.</p></details>
+    <details><summary>Comment ça se passe si le destinataire n'a pas d'adresse précise ?</summary><p>C'est prévu. Il reçoit un lien WhatsApp et pose lui-même un repère sur la carte, avec un point de repère en texte ou un message vocal.</p></details>
+    <details><summary>Comment puis-je payer ?</summary><p>Carte bancaire depuis la France. Wave, Orange Money et MTN Money depuis la Côte d'Ivoire.</p></details>
+    <details><summary>Et si mon colis dépasse 23 kg ?</summary><p>Choisissez « Plus gros » dans le calculateur. Nous vous répondons sur WhatsApp sous 2 heures ouvrées avec un prix ferme.</p></details>
+  </section>
+
+  <section>
+    <h2 class="titre">Nos liaisons</h2>
+    <ul class="liens">
+      <li><a href="#">Envoyer un colis Paris → Abidjan</a></li>
+      <li><a href="#">Envoyer un colis Lyon → Abidjan</a></li>
+      <li><a href="#">Envoyer un colis Marseille → Abidjan</a></li>
+      <li><a href="#">Envoyer un colis Abidjan → Paris</a></li>
+      <li><a href="#">Envoyer une valise en Côte d'Ivoire</a></li>
+      <li><a href="#">Prix d'un colis pour Abidjan</a></li>
+    </ul>
+  </section>
+
 </div>
+</main>
+
+<footer>
+  <div class="wrap">BABI SHIP — Livraison de colis Abidjan ⇄ France / Europe.</div>
+</footer>
 
 <script>
-  // Tarifs provisoires (À CONFIRMER) — mêmes valeurs que le moteur de prix babiship.
-  var TRAJETS = {
-    "fr-ci": { de: "France", vers: "Abidjan", aVers: "à Abidjan", ico: "🇫🇷 → 🇨🇮", devise: "EUR", fixe: 9, parKg: 8, arrondi: 1, avantDepart: 2, acheminement: 5 },
-    "ci-fr": { de: "Abidjan", vers: "France", aVers: "en France", ico: "🇨🇮 → 🇫🇷", devise: "FCFA", fixe: 6000, parKg: 5500, arrondi: 100, avantDepart: 2, acheminement: 4 }
-  };
-  var TAILLES = [
-    { id: "enveloppe", ico: "✉️", nom: "Une enveloppe, des papiers", kg: 0.5 },
-    { id: "chaussures", ico: "👟", nom: "Une paire de chaussures", kg: 2 },
-    { id: "carton", ico: "📦", nom: "Un carton à chaussures plein", kg: 5 },
-    { id: "cabine", ico: "🧳", nom: "Une valise cabine", kg: 10 },
-    { id: "soute", ico: "🧳", nom: "Une grande valise", kg: 23 },
-    { id: "plus", ico: "🚚", nom: "Plus gros", kg: null }
-  ];
+var TAILLES=[
+  {id:"env", ico:"✉️", nom:"Une enveloppe",        det:"Papiers, photos",              eur:15},
+  {id:"ch",  ico:"👟", nom:"Une paire de chaussures",det:"Jusqu'à 2 kg",                eur:25},
+  {id:"ct",  ico:"📦", nom:"Un carton à chaussures", det:"Plusieurs paires, jusqu'à 7 kg",eur:55},
+  {id:"vc",  ico:"🧳", nom:"Une valise cabine",      det:"Jusqu'à 10 kg",               eur:75},
+  {id:"gv",  ico:"🧳", nom:"Une grande valise",      det:"Jusqu'à 23 kg",               eur:150},
+  {id:"gros",ico:"🚚", nom:"Plus gros",              det:"On vous fait un devis",       eur:null}
+];
 
-  var choix = { sens: null, taille: null };
+var sens="fr", choix=null;
+var zoneT=document.getElementById("tailles");
+var zoneR=document.getElementById("resultat");
 
-  function jourOuvre(d) { var j = d.getDay(); return j !== 0 && j !== 6; }
-  function ajouterJoursOuvres(date, n) {
-    var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    while (n > 0) { d.setDate(d.getDate() + 1); if (jourOuvre(d)) n--; }
-    return d;
-  }
-  function formatDate(d) {
-    return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
-  }
-  function formatPrix(montant, devise) {
-    var n = montant.toLocaleString("fr-FR").replace(/ | /g, " ");
-    return devise === "EUR" ? n + " €" : n + " FCFA";
-  }
+TAILLES.forEach(function(t){
+  var b=document.createElement("button");
+  b.type="button"; b.className="taille"; b.setAttribute("aria-pressed","false"); b.dataset.id=t.id;
+  b.innerHTML='<span class="ico">'+t.ico+'</span><span><span class="nom">'+t.nom+'</span><span class="det">'+t.det+'</span></span>';
+  b.addEventListener("click",function(){
+    choix=t.id;
+    Array.prototype.forEach.call(zoneT.children,function(x){x.setAttribute("aria-pressed", x.dataset.id===t.id?"true":"false")});
+    afficher();
+  });
+  zoneT.appendChild(b);
+});
 
-  // Prix et date calculés une seule fois pour un choix donné.
-  function calculer(t, taille) {
-    var brut = t.fixe + t.parKg * taille.kg;
-    var prix = Math.ceil(brut / t.arrondi) * t.arrondi;
-    var depart = ajouterJoursOuvres(new Date(), t.avantDepart);
-    var livraison = ajouterJoursOuvres(depart, t.acheminement);
-    return { prix: prix, livraison: livraison };
-  }
+Array.prototype.forEach.call(document.querySelectorAll(".opt"),function(o){
+  o.addEventListener("click",function(){
+    sens=o.dataset.sens;
+    Array.prototype.forEach.call(document.querySelectorAll(".opt"),function(x){x.setAttribute("aria-pressed", x.dataset.sens===sens?"true":"false")});
+    if(choix) afficher();
+  });
+});
 
-  function bouton(conteneur, html, actif, auClic, classe) {
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = "tuile" + (classe ? " " + classe : "");
-    b.setAttribute("aria-pressed", actif ? "true" : "false");
-    b.innerHTML = html;
-    b.addEventListener("click", auClic);
-    conteneur.appendChild(b);
-  }
+function joursOuvres(n){
+  var d=new Date(), a=0;
+  while(a<n){ d.setDate(d.getDate()+1); var j=d.getDay(); if(j!==0&&j!==6) a++; }
+  return d;
+}
+function dateTexte(d){
+  var J=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+  var M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  return J[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];
+}
+function espaces(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g," "); }
 
-  function afficher() {
-    var s = document.getElementById("sens");
-    s.innerHTML = "";
-    Object.keys(TRAJETS).forEach(function (id) {
-      var t = TRAJETS[id];
-      bouton(s, '<span class="ico">' + t.ico + '</span><b>' + t.de + ' → ' + t.vers + '</b>',
-        choix.sens === id, function () { choix.sens = id; afficher(); }, "sens");
-    });
+function afficher(){
+  var t=null;
+  TAILLES.forEach(function(x){ if(x.id===choix) t=x; });
+  if(!t) return;
 
-    var g = document.getElementById("tailles");
-    g.innerHTML = "";
-    TAILLES.forEach(function (x) {
-      var detail = x.kg ? "jusqu'à " + String(x.kg).replace(".", ",") + " kg" : "déménagement, marchandises";
-      bouton(g, '<span class="ico">' + x.ico + '</span><span>' + x.nom + '<small>' + detail + '</small></span>',
-        choix.taille === x.id, function () { choix.taille = x.id; afficher(); });
-    });
-
-    var r = document.getElementById("resultat");
-    if (!choix.sens || !choix.taille) {
-      r.className = "resultat attente";
-      r.textContent = "Choisissez le sens et la taille pour voir votre prix.";
-      return;
-    }
-    var t = TRAJETS[choix.sens];
-    var taille = TAILLES.filter(function (x) { return x.id === choix.taille; })[0];
-    if (!taille.kg) {
-      r.className = "resultat devis";
-      r.innerHTML = '<p class="etiquette">' + t.de + ' → ' + t.vers + '</p>' +
-        '<p class="prix" style="font-size:26px">Sur devis</p>' +
-        '<p class="inclus" style="opacity:1">Nous vous répondons sur WhatsApp sous 2 heures ouvrées.</p>' +
-        '<button class="bouton" type="button" disabled>Demander un devis (bientôt)</button>';
-      return;
-    }
-    var res = calculer(t, taille);
-    r.className = "resultat";
-    r.innerHTML = '<p class="etiquette">' + t.de + ' → ' + t.vers + ' · ' + taille.nom.toLowerCase() + '</p>' +
-      '<p class="prix" id="prix">' + formatPrix(res.prix, t.devise) + '</p>' +
-      '<p class="inclus">Prix ferme, tout compris : collecte, transport, livraison.</p>' +
-      '<p class="date">Livré ' + t.aVers + ' le<b id="date">' + formatDate(res.livraison) + '</b></p>' +
-      '<button class="bouton" type="button" disabled>Envoyer mon colis (bientôt)</button>';
+  if(t.eur===null){
+    zoneR.innerHTML='<div class="devis"><p>Nous vous faisons un devis</p><span>Réponse sur WhatsApp sous 2 heures ouvrées.</span></div>'+
+                    '<a class="btn" href="#">Demander mon devis</a>';
+    return;
   }
 
-  afficher();
+  var versCI = (sens==="fr");
+  var prix = versCI ? (t.eur+" €") : (espaces(Math.round(t.eur*655.957/100)*100)+" FCFA");
+  var d = dateTexte(joursOuvres(versCI?6:7));
+  var arrivee = versCI ? "Abidjan" : "France";
+
+  zoneR.innerHTML=
+    '<div class="prix-boite"><span class="prix">'+prix+'</span><p class="prix-note">Tout compris · collecte incluse</p></div>'+
+    '<div class="date-boite">Livré en '+arrivee+' le <strong>'+d+'</strong></div>'+
+    '<a class="btn" href="#">J\'envoie mon colis</a>'+
+    '<a class="btn btn-2" href="#suivi">Comment ça marche</a>';
+}
 </script>
 </body>
 </html>
