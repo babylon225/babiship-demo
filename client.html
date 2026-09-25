@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BABI SHIP — Démonstration du parcours client</title>
+<meta name="description" content="Découvrez le parcours complet d'un envoi de colis entre la France et Abidjan : prix ferme, collecte, suivi WhatsApp.">
+<style>
+:root{
+  --vert:#0d6b45;--vert-fonce:#08502f;--vert-clair:#e6f4ed;
+  --fond:#fff;--fond-2:#f6f8f7;--texte:#14201a;--doux:#5a6b62;--bord:#dde5e1;
+  --ombre:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.05);
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --vert:#2f9d70;--vert-fonce:#247a57;--vert-clair:#12271e;
+  --fond:#0e1512;--fond-2:#141d19;--texte:#eef4f1;--doux:#9db0a6;--bord:#26332c;
+  --ombre:0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);}}
+:root[data-theme="dark"]{--vert:#2f9d70;--vert-fonce:#247a57;--vert-clair:#12271e;--fond:#0e1512;--fond-2:#141d19;--texte:#eef4f1;--doux:#9db0a6;--bord:#26332c;}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:70px}
+body{margin:0;background:var(--fond);color:var(--texte);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{width:100%;max-width:640px;margin:0 auto;padding:0 20px}
+
+.bandeau{background:var(--vert-fonce);color:#fff;font-size:13.5px;text-align:center;padding:9px 16px;line-height:1.4}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--fond);border-bottom:1px solid var(--bord)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:58px}
+.logo{font-weight:800;letter-spacing:.06em;color:var(--vert);font-size:18px;background:none;border:0;cursor:pointer;font-family:inherit;padding:0}
+.mini{font-weight:600;font-size:14px;color:var(--doux);background:none;border:1px solid var(--bord);border-radius:9px;padding:9px 12px;cursor:pointer;font-family:inherit}
+.mini:hover{border-color:var(--vert);color:var(--vert)}
+
+.vue{display:none}
+.vue.on{display:block}
+
+h1{font-size:31px;line-height:1.2;margin:0 0 12px;letter-spacing:-.02em}
+h2.titre{font-size:23px;margin:0 0 16px;letter-spacing:-.01em}
+.chapo{color:var(--doux);margin:0 0 20px}
+.puces{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:0;list-style:none}
+.puces li{font-size:14px;font-weight:600;background:var(--vert-clair);color:var(--vert);padding:7px 12px;border-radius:999px}
+.hero{padding:30px 0 6px}
+section{padding:36px 0}
+
+/* boutons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border:0;border-radius:14px;background:var(--vert);color:#fff;font:inherit;font-weight:700;font-size:17px;cursor:pointer;margin-top:14px;font-family:inherit}
+.btn:hover{background:var(--vert-fonce)}
+.btn:disabled{background:var(--bord);color:var(--doux);cursor:not-allowed}
+.btn-2{background:transparent;color:var(--vert);border:2px solid var(--vert)}
+.btn-2:hover{background:var(--vert-clair)}
+
+/* choix */
+.grille2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grille3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:78px;padding:12px 8px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);cursor:pointer;font:inherit;font-weight:700;font-size:15px;text-align:center;line-height:1.25;font-family:inherit}
+.opt:hover{border-color:var(--vert)}
+.opt[aria-pressed="true"]{border-color:var(--vert);background:var(--vert-clair);color:var(--vert)}
+.opt .gros{font-size:24px}
+.ligne{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:12px 14px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);cursor:pointer;font:inherit;text-align:left;margin-bottom:10px;font-family:inherit}
+.ligne:hover{border-color:var(--vert)}
+.ligne[aria-pressed="true"]{border-color:var(--vert);background:var(--vert-clair)}
+.ligne .ico{font-size:25px;flex:0 0 auto;width:32px;text-align:center}
+.ligne .nom{font-weight:700;font-size:16px;display:block}
+.ligne .det{color:var(--doux);font-size:14px}
+.ligne[aria-pressed="true"] .det{color:var(--vert)}
+
+/* parcours */
+.pbar{display:flex;gap:5px;padding:12px 0 2px}
+.pbar i{flex:1;height:5px;border-radius:3px;background:var(--bord)}
+.pbar i.f{background:var(--vert)}
+.etape{padding:6px 0 30px}
+.etape h2{font-size:25px;margin:14px 0 18px;letter-spacing:-.01em;line-height:1.25}
+.retour{background:none;border:0;color:var(--vert);font:inherit;font-weight:700;cursor:pointer;padding:6px 0;font-family:inherit;font-size:15px}
+
+/* prix */
+.prix-boite{background:var(--vert);color:#fff;border-radius:16px;padding:22px}
+.prix{font-size:42px;font-weight:800;line-height:1;letter-spacing:-.02em;display:block;margin-bottom:8px}
+.prix-note{font-size:15px;opacity:.92;margin:0}
+.info{background:var(--vert-clair);color:var(--vert);border-radius:14px;padding:14px 16px;margin-top:12px;font-size:15px}
+.info strong{display:block;font-size:17px}
+.recap{margin-top:18px;border-top:1px solid var(--bord);padding-top:14px}
+.recap div{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:15px}
+.recap span{color:var(--doux)}
+
+/* champs */
+label.lab{display:block;font-weight:700;font-size:15px;margin:16px 0 8px}
+input,textarea{width:100%;min-height:56px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);font:inherit;padding:14px;font-family:inherit}
+input:focus,textarea:focus{outline:none;border-color:var(--vert)}
+textarea{min-height:110px;resize:vertical}
+.tel{display:flex;gap:10px}
+.tel .ind{flex:0 0 auto;display:flex;align-items:center;padding:0 14px;border:2px solid var(--bord);border-radius:14px;font-weight:700;background:var(--fond-2)}
+.aide{color:var(--doux);font-size:14.5px;margin:8px 0 0}
+
+/* carte */
+.carte-svg{width:100%;border-radius:14px;border:1px solid var(--bord);display:block;cursor:crosshair;background:#e8efe9}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .carte-svg{background:#182420}}
+.pin-info{margin-top:10px;font-weight:700;color:var(--vert);font-size:15px}
+
+/* suivi */
+.tl{list-style:none;margin:20px 0 0;padding:0}
+.tl li{display:flex;gap:14px;padding:0 0 22px;position:relative}
+.tl li::before{content:"";position:absolute;left:17px;top:36px;bottom:0;width:2px;background:var(--bord)}
+.tl li:last-child::before{display:none}
+.tl .rond{flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:var(--fond-2);border:2px solid var(--bord);display:flex;align-items:center;justify-content:center;font-size:17px}
+.tl li.ok .rond{background:var(--vert-clair);border-color:var(--vert)}
+.tl li.ok b{color:var(--vert)}
+.tl b{display:block;font-size:16px}
+.tl span{color:var(--doux);font-size:14.5px}
+
+.bloc{background:var(--fond-2);border:1px solid var(--bord);border-radius:16px;padding:18px;margin-top:14px}
+.bandeau-vert{background:var(--vert);color:#fff;border-radius:16px;padding:20px}
+.bandeau-vert .num{font-size:30px;font-weight:800;letter-spacing:.04em;display:block;margin:4px 0}
+.bandeau-vert small{opacity:.9;font-size:14.5px}
+
+.etapes{list-style:none;margin:0;padding:0;counter-reset:e}
+.etapes li{counter-increment:e;display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--bord)}
+.etapes li:last-child{border-bottom:0}
+.etapes li::before{content:counter(e);flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:var(--vert-clair);color:var(--vert);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+.etapes b{display:block;font-size:16px}
+.etapes span{color:var(--doux);font-size:15px}
+.cartes{display:grid;gap:12px}
+@media (min-width:620px){.cartes{grid-template-columns:1fr 1fr}h1{font-size:38px}}
+.cc{background:var(--fond-2);border:1px solid var(--bord);border-radius:14px;padding:16px}
+.cc b{display:block;margin-bottom:4px;font-size:16px}
+.cc span{color:var(--doux);font-size:15px}
+details{border-bottom:1px solid var(--bord);padding:14px 0}
+summary{font-weight:700;cursor:pointer;font-size:16px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";float:right;color:var(--vert);font-weight:800}
+details[open] summary::after{content:"–"}
+details p{color:var(--doux);margin:10px 0 0;font-size:15px}
+.marques{background:var(--vert-clair);border-radius:18px;padding:22px}
+.marques h2{margin-top:0;color:var(--vert)}
+footer{border-top:1px solid var(--bord);padding:24px 0 40px;color:var(--doux);font-size:14px}
+.note{background:#fff8e6;border:1px solid #f0dca8;color:#6b5312;border-radius:12px;padding:12px 14px;font-size:14px;margin:16px 0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .note{background:#2a2412;border-color:#4d411c;color:#e6d39a}}
+</style>
+</head>
+<body>
+
+<div class="bandeau">Démonstration — parcourez le service exactement comme un client</div>
+
+<header><div class="wrap bar">
+  <button class="logo" onclick="aller('accueil')">BABI SHIP</button>
+  <a class="mini" href="index.html" style="text-decoration:none;display:inline-block">← Menu</a>
+</div></header>
+
+<!-- ACCUEIL -->
+<div class="vue on" id="v-accueil"><div class="wrap">
+  <div class="hero">
+    <h1>Envoyez un colis entre la France et Abidjan</h1>
+    <p class="chapo">Prix ferme, tout compris. Collecte à domicile. Suivi sur WhatsApp. Sans créer de compte.</p>
+    <ul class="puces"><li>Prix tout compris</li><li>Collecte incluse</li><li>Suivi WhatsApp</li><li>Sans compte</li></ul>
+    <button class="btn" onclick="demarrer()">Envoyer un colis</button>
+    <button class="btn btn-2" onclick="aller('suivi')">Suivre un colis</button>
+  </div>
+
+  <div class="note"><strong>Démonstration.</strong> Les tarifs et délais sont des valeurs d'exemple. Aucun paiement n'est possible.</div>
+
+  <section>
+    <h2 class="titre">Comment ça marche</h2>
+    <ol class="etapes">
+      <li><span><b>Vous obtenez votre prix</b><span>Trois questions, prix ferme tout compris. Aucun compte à créer.</span></span></li>
+      <li><span><b>Nous venons chercher le colis</b><span>Collecte à domicile incluse, ou dépôt au point BABI SHIP le plus proche. Départ sous 48 h.</span></span></li>
+      <li><span><b>Le destinataire indique où livrer</b><span>Il reçoit un lien WhatsApp et pose lui-même son repère sur la carte.</span></span></li>
+      <li><span><b>Vous suivez jusqu'à la remise</b><span>Un seul numéro de suivi, une notification WhatsApp à chaque étape.</span></span></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2 class="titre">Pourquoi BABI SHIP</h2>
+    <div class="cartes">
+      <div class="cc"><b>Le prix affiché est le prix payé</b><span>Rien à régler à la livraison. Aucune surprise pour celui qui reçoit.</span></div>
+      <div class="cc"><b>Pensé pour Abidjan</b><span>Pas besoin d'adresse postale : un repère sur la carte suffit.</span></div>
+      <div class="cc"><b>Tout passe par WhatsApp</b><span>Suivi, collecte, livraison. Pas d'e-mail à surveiller.</span></div>
+      <div class="cc"><b>Preuve à chaque étape</b><span>Photo horodatée à la collecte et à la remise du colis.</span></div>
+    </div>
+  </section>
+
+  <section><div class="marques">
+    <h2 class="titre">Vous vendez depuis Abidjan ?</h2>
+    <p>Continuez à vendre comme aujourd'hui. Nous rendons simplement vos produits livrables en France et en Europe. Vos clients voient le prix de livraison au moment de payer, vous n'avancez rien.</p>
+    <button class="btn" onclick="demarrer()">Voir le parcours client</button>
+  </div></section>
+
+  <section>
+    <h2 class="titre">Questions fréquentes</h2>
+    <details><summary>Combien de temps dure la livraison ?</summary><p>Le colis part sous 48 h après la commande. Comptez ensuite 6 jours ouvrés vers Abidjan et 7 jours ouvrés vers la France. La date exacte est annoncée avant le paiement.</p></details>
+    <details><summary>Y a-t-il des frais à payer à la livraison ?</summary><p>Non. Le prix affiché au moment de la commande est le prix total. Le destinataire n'a rien à régler.</p></details>
+    <details><summary>Et si le destinataire n'a pas d'adresse précise ?</summary><p>C'est prévu. Il reçoit un lien WhatsApp et pose lui-même un repère sur la carte, avec un point de repère en texte.</p></details>
+    <details><summary>Comment puis-je payer ?</summary><p>Carte bancaire depuis la France. Wave, Orange Money et MTN Money depuis la Côte d'Ivoire.</p></details>
+    <details><summary>Et si mon colis dépasse 23 kg ?</summary><p>Choisissez « Plus gros ». Nous répondons sur WhatsApp sous 2 heures ouvrées avec un prix ferme.</p></details>
+  </section>
+</div></div>
+
+<!-- PARCOURS -->
+<div class="vue" id="v-parcours"><div class="wrap">
+  <div class="pbar" id="pbar"></div>
+  <button class="retour" id="btn-retour" onclick="precedent()">← Retour</button>
+  <div class="etape" id="etape"></div>
+</div></div>
+
+<!-- CONFIRMATION -->
+<div class="vue" id="v-confirm"><div class="wrap"><div class="etape" id="confirm"></div></div></div>
+
+<!-- SUIVI -->
+<div class="vue" id="v-suivi"><div class="wrap"><div class="etape" id="suivi"></div></div></div>
+
+<!-- DESTINATAIRE -->
+<div class="vue" id="v-dest"><div class="wrap"><div class="etape" id="dest"></div></div></div>
+
+<footer><div class="wrap">BABI SHIP · Abidjan ⇄ France / Europe · Démonstration</div></footer>
+
+<script>
+/* ---------- données ---------- */
+var CONTENUS=[
+ {id:"vet",i:"👕",n:"Vêtements"},{id:"cha",i:"👟",n:"Chaussures"},
+ {id:"ali",i:"🥫",n:"Alimentaire"},{id:"bea",i:"🧴",n:"Beauté"},
+ {id:"tel",i:"📱",n:"Téléphone, appareil"},{id:"doc",i:"📄",n:"Documents"},
+ {id:"cad",i:"🎁",n:"Cadeaux, divers"}
+];
+var TAILLES=[
+ {id:"env",i:"✉️",n:"Une enveloppe",d:"Papiers, photos",p:15},
+ {id:"ch", i:"👟",n:"Une paire de chaussures",d:"Jusqu'à 2 kg",p:25},
+ {id:"ct", i:"📦",n:"Un carton à chaussures",d:"Plusieurs paires, jusqu'à 7 kg",p:55},
+ {id:"vc", i:"🧳",n:"Une valise cabine",d:"Jusqu'à 10 kg",p:75},
+ {id:"gv", i:"🧳",n:"Une grande valise",d:"Jusqu'à 23 kg",p:150},
+ {id:"pg", i:"🚚",n:"Plus gros",d:"On vous fait un devis",p:null}
+];
+var POINTS=[
+ {n:"BABI SHIP Riviera 2",q:"Cocody · 1,5 km"},
+ {n:"BABI SHIP Zone 4",q:"Marcory · 4,2 km"},
+ {n:"BABI SHIP Liberté",q:"Adjamé · 6,8 km"}
+];
+var STATUTS=["Colis enregistré","Colis pris en charge","Au centre de départ","En vol","Arrivé à destination","En cours de livraison","Livré"];
+var ICO=["📝","📦","🏢","✈️","🛬","🛵","✅"];
+
+var E={sens:null,contenu:null,taille:null,remise:null,adresse:null,complement:"",pin:null,repere:"",point:null,tel:"",prix:null,date:null,num:null};
+var pas=1, TOTAL=8;
+
+/* ---------- utilitaires ---------- */
+function joursOuvres(n){var d=new Date(),a=0;while(a<n){d.setDate(d.getDate()+1);var j=d.getDay();if(j!==0&&j!==6)a++;}return d;}
+function dateTexte(d){var J=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"],M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];return J[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];}
+function esp(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ");}
+function versCI(){return E.sens==="fr";}
+function fmtPrix(eur){return versCI()? eur+" €" : esp(Math.round(eur*655.957/100)*100)+" FCFA";}
+function indicatif(){return versCI()?"+33":"+225";}
+function trouve(t,id){for(var i=0;i<t.length;i++)if(t[i].id===id)return t[i];return null;}
+function aller(v){
+  var l=document.querySelectorAll(".vue");
+  for(var i=0;i<l.length;i++)l[i].classList.remove("on");
+  document.getElementById("v-"+v).classList.add("on");
+  window.scrollTo(0,0);
+  if(v==="suivi")rendreSuivi();
+  if(v==="dest")rendreDest();
+}
+function demarrer(){E={sens:null,contenu:null,taille:null,remise:null,adresse:null,complement:"",pin:null,repere:"",point:null,tel:"",prix:null,date:null,num:null};pas=1;aller("parcours");rendre();}
+
+/* ---------- parcours ---------- */
+function rendre(){
+  var b=document.getElementById("pbar");b.innerHTML="";
+  for(var i=1;i<=TOTAL;i++){var s=document.createElement("i");if(i<=pas)s.className="f";b.appendChild(s);}
+  document.getElementById("btn-retour").style.visibility = pas>1 ? "visible":"hidden";
+  var z=document.getElementById("etape");
+  z.innerHTML = ecran(pas);
+  window.scrollTo(0,0);
+  if(pas===6 && E.remise==="collecte" && !versCI()) brancherCarteNon();
+  if(pas===6 && E.remise==="collecte" && versCI()) brancherCarte();
+}
+function suivant(){ if(pas<TOTAL){pas++;rendre();} }
+function precedent(){ if(pas>1){pas--;rendre();} }
+
+function ecran(n){
+  if(n===1){
+    return '<h2>Vous envoyez un colis…</h2><div class="grille2">'+
+      opt("sens","fr","🇫🇷 → 🇨🇮","France → Abidjan")+
+      opt("sens","ci","🇨🇮 → 🇫🇷","Abidjan → France")+
+      '</div>'+cont(E.sens);
+  }
+  if(n===2){
+    var h='<h2>Qu\'y a-t-il dans le colis ?</h2><div class="grille3">';
+    CONTENUS.forEach(function(c){h+=opt("contenu",c.id,c.i,c.n);});
+    return h+'</div>'+cont(E.contenu);
+  }
+  if(n===3){
+    var h='<h2>C\'est gros comme…</h2>';
+    TAILLES.forEach(function(t){h+=lig("taille",t.id,t.i,t.n,t.d);});
+    return h+cont(E.taille);
+  }
+  if(n===4){
+    var t=trouve(TAILLES,E.taille);
+    if(t && t.p===null){
+      return '<h2>Demande de devis</h2>'+
+        '<label class="lab">Votre nom</label><input placeholder="Ex. : Awa K.">'+
+        '<label class="lab">Votre WhatsApp</label><div class="tel"><span class="ind">'+indicatif()+'</span><input placeholder="07 00 00 00 00"></div>'+
+        '<label class="lab">Que voulez-vous envoyer ?</label><textarea placeholder="Ex. : 3 gros cartons de vêtements"></textarea>'+
+        '<button class="btn" onclick="aller(\'accueil\')">Envoyer ma demande</button>'+
+        '<p class="aide" style="text-align:center">Nous vous répondons sur WhatsApp sous 2 heures ouvrées.</p>';
+    }
+    E.prix=t.p; E.date=dateTexte(joursOuvres(versCI()?6:7));
+    var c=trouve(CONTENUS,E.contenu);
+    return '<h2>Votre prix</h2>'+
+      '<div class="prix-boite"><span class="prix">'+fmtPrix(t.p)+'</span><p class="prix-note">Tout compris · collecte incluse</p></div>'+
+      '<div class="info">Livré '+(versCI()?"à Abidjan":"en France")+' le <strong>'+E.date+'</strong></div>'+
+      '<div class="recap">'+
+        '<div><span>Trajet</span><b>'+(versCI()?"France → Abidjan":"Abidjan → France")+'</b></div>'+
+        '<div><span>Contenu</span><b>'+c.i+' '+c.n+'</b></div>'+
+        '<div><span>Taille</span><b>'+t.n+'</b></div>'+
+        '<div><span>Départ</span><b>sous 48 h</b></div>'+
+      '</div>'+
+      '<button class="btn" onclick="suivant()">J\'envoie mon colis</button>';
+  }
+  if(n===5){
+    return '<h2>Comment nous remettez-vous le colis ?</h2>'+
+      lig("remise","collecte","🏠","On vient chez vous","Collecte à domicile, incluse")+
+      lig("remise","depot","📍","Je dépose le colis","Au point BABI SHIP le plus proche")+
+      cont(E.remise);
+  }
+  if(n===6){
+    if(E.remise==="depot"){
+      var h='<h2>Où déposez-vous le colis ?</h2>';
+      POINTS.forEach(function(p,i){h+=lig("point",String(i),"📍",p.n,p.q);});
+      return h+cont(E.point);
+    }
+    if(versCI()){
+      return '<h2>Votre adresse</h2>'+
+        '<button class="ligne" aria-pressed="true"><span class="ico">🏠</span><span><span class="nom">12 rue Doudeauville</span><span class="det">75018 Paris</span></span></button>'+
+        '<label class="lab">Complément <span style="font-weight:400;color:var(--doux)">(facultatif)</span></label>'+
+        '<input placeholder="Étage, digicode, bâtiment">'+
+        '<button class="btn" onclick="suivant()">Continuer</button>';
+    }
+    return '<h2>Où venons-nous chercher le colis ?</h2>'+
+      '<p class="aide" style="margin:0 0 12px">Touchez la carte pour poser le pin.</p>'+
+      carteSVG()+
+      '<p class="pin-info" id="pin-info">'+(E.pin?"📍 Pin posé · "+E.pin:"Aucun pin posé")+'</p>'+
+      '<label class="lab">Un repère</label><input id="rep" value="'+E.repere+'" placeholder="Ex. : portail bleu en face de la pharmacie">'+
+      '<button class="btn" id="btn-pin" onclick="validerPin()" '+(E.pin?"":"disabled")+'>Continuer</button>';
+  }
+  if(n===7){
+    return '<h2>Le WhatsApp de la personne qui reçoit</h2>'+
+      '<div class="tel"><span class="ind">'+(versCI()?"+225":"+33")+'</span><input id="tel" value="'+E.tel+'" placeholder="07 00 00 00 00" oninput="majTel(this.value)"></div>'+
+      '<p class="aide">📍 Il recevra un lien pour indiquer lui-même où livrer.</p>'+
+      '<button class="btn" id="btn-tel" onclick="suivant()" '+(E.tel.length>=6?"":"disabled")+'>Continuer</button>';
+  }
+  if(n===8){
+    var moyens = versCI()
+      ? [["💳","Carte bancaire"],["🌊","Wave"],["🟠","Orange Money"],["🟡","MTN Money"]]
+      : [["🌊","Wave"],["🟠","Orange Money"],["🟡","MTN Money"],["💳","Carte bancaire"]];
+    var h='<h2>Paiement</h2><div class="note">Démonstration : aucun argent n\'est prélevé.</div>';
+    moyens.forEach(function(m){h+='<button class="ligne" onclick="payer(this)"><span class="ico">'+m[0]+'</span><span><span class="nom">'+m[1]+'</span></span></button>';});
+    return h+'<button class="btn" onclick="terminer()">Payer '+fmtPrix(E.prix)+'</button>';
+  }
+  return "";
+}
+function opt(champ,val,ico,txt){
+  var on = E[champ]===val;
+  return '<button class="opt" type="button" aria-pressed="'+on+'" onclick="choisir(\''+champ+'\',\''+val+'\')"><span class="gros">'+ico+'</span><span>'+txt+'</span></button>';
+}
+function lig(champ,val,ico,nom,det){
+  var on = E[champ]===val;
+  return '<button class="ligne" type="button" aria-pressed="'+on+'" onclick="choisir(\''+champ+'\',\''+val+'\')"><span class="ico">'+ico+'</span><span><span class="nom">'+nom+'</span>'+(det?'<span class="det">'+det+'</span>':'')+'</span></button>';
+}
+function cont(actif){
+  return '<button class="btn" onclick="suivant()" '+(actif!==null&&actif!==undefined?"":"disabled")+'>Continuer</button>';
+}
+function choisir(champ,val){E[champ]=val;rendre();}
+function majTel(v){E.tel=v.replace(/\s/g,"");document.getElementById("btn-tel").disabled = E.tel.length<6;}
+function payer(el){
+  var l=el.parentNode.querySelectorAll(".ligne");
+  for(var i=0;i<l.length;i++)l[i].setAttribute("aria-pressed","false");
+  el.setAttribute("aria-pressed","true");
+}
+
+/* carte simplifiée d'Abidjan */
+function carteSVG(){
+  return '<svg class="carte-svg" id="carte" viewBox="0 0 360 200" onclick="poserPin(event)">'+
+  '<rect width="360" height="200" fill="#e3ece5"/>'+
+  '<path d="M0 118 H360 V150 H0 Z" fill="#bcd6e8"/>'+
+  '<path d="M120 118 L150 150 L190 118 Z" fill="#bcd6e8"/>'+
+  '<path d="M40 40 H320 M180 20 V180 M90 60 L280 140" stroke="#fff" stroke-width="5"/>'+
+  '<g font-size="11" font-weight="700" fill="#4a5a52" font-family="sans-serif">'+
+  '<text x="150" y="30">Abobo</text><text x="105" y="62">Adjamé</text><text x="255" y="62">Cocody</text>'+
+  '<text x="20" y="80">Yopougon</text><text x="145" y="92">Plateau</text>'+
+  '<text x="95" y="172">Treichville</text><text x="215" y="168">Marcory</text><text x="285" y="190">Koumassi</text>'+
+  '</g>'+
+  (E.pinXY?'<g><circle cx="'+E.pinXY[0]+'" cy="'+E.pinXY[1]+'" r="7" fill="#e8622c"/><circle cx="'+E.pinXY[0]+'" cy="'+E.pinXY[1]+'" r="2.5" fill="#fff"/></g>':'')+
+  '</svg>';
+}
+function brancherCarte(){}
+function brancherCarteNon(){}
+function poserPin(ev){
+  var svg=document.getElementById("carte");
+  var r=svg.getBoundingClientRect();
+  var x=(ev.clientX-r.left)/r.width*360, y=(ev.clientY-r.top)/r.height*200;
+  E.pinXY=[x,y];
+  E.pin = x<110 ? "Yopougon" : (x>215 ? "Cocody" : (y>120 ? "Marcory" : "Plateau"));
+  rendre();
+}
+function validerPin(){var r=document.getElementById("rep");if(r)E.repere=r.value;suivant();}
+
+/* ---------- confirmation ---------- */
+function terminer(){
+  E.num="BS-"+Math.floor(100000+Math.random()*899999);
+  document.getElementById("confirm").innerHTML=
+    '<h2 style="text-align:center">C\'est parti !</h2>'+
+    '<div class="bandeau-vert" style="text-align:center"><small>Votre numéro de suivi</small><span class="num">'+E.num+'</span><small>'+(versCI()?"France → Abidjan":"Abidjan → France")+' · livré le '+E.date+'</small></div>'+
+    '<div class="bloc">💬 Le destinataire reçoit un lien WhatsApp au '+(versCI()?"+225":"+33")+' '+E.tel+'.</div>'+
+    '<div class="bloc">🏠 Nous vous contactons sur WhatsApp pour la collecte. Départ sous 48 h.</div>'+
+    '<button class="btn" onclick="aller(\'suivi\')">Suivre mon colis</button>'+
+    '<button class="btn btn-2" onclick="aller(\'dest\')">Voir ce que reçoit le destinataire</button>'+
+    '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+  aller("confirm");
+}
+
+/* ---------- suivi ---------- */
+var avance=2;
+function rendreSuivi(){
+  var num=E.num||"BS-230755", d=E.date||dateTexte(joursOuvres(6));
+  var h='<h2>Suivi du colis</h2>'+
+    '<div class="bandeau-vert"><small>Numéro de suivi</small><span class="num">'+num+'</span><small>'+(E.sens?(versCI()?"France → Abidjan":"Abidjan → France"):"France → Abidjan")+' · livraison prévue le '+d+'</small></div>'+
+    '<button class="btn" onclick="alert(\'Démonstration : ouvrirait WhatsApp avec le lien de suivi.\')">Partager sur WhatsApp</button>'+
+    '<button class="btn btn-2" onclick="copier(this)">Copier le numéro</button>'+
+    '<ul class="tl">';
+  STATUTS.forEach(function(s,i){
+    h+='<li class="'+(i<avance?"ok":"")+'"><span class="rond">'+ICO[i]+'</span><span><b>'+s+'</b>'+(i<avance?'<span>Aujourd\'hui</span>':(i===STATUTS.length-1?'<span>Prévu le '+d+'</span>':''))+'</span></li>';
+  });
+  h+='</ul><button class="btn btn-2" onclick="avancer()">▶ Faire avancer le colis (démo)</button>'+
+     '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+  document.getElementById("suivi").innerHTML=h;
+}
+function avancer(){ avance = avance>=STATUTS.length ? 1 : avance+1; rendreSuivi(); }
+function copier(b){ b.textContent="Numéro copié ✓"; setTimeout(function(){b.textContent="Copier le numéro";},1800); }
+
+/* ---------- vue destinataire ---------- */
+function rendreDest(){
+  document.getElementById("dest").innerHTML=
+    '<div class="note">Voici la page que reçoit le destinataire par WhatsApp. Aucun compte, aucune application.</div>'+
+    '<h2>Un colis arrive pour vous</h2>'+
+    '<div class="bloc">📦 Colis '+(E.num||"BS-230755")+' · arrivée prévue le '+(E.date||dateTexte(joursOuvres(6)))+'</div>'+
+    '<p class="aide" style="margin:18px 0 10px">Indiquez où vous livrer. Touchez la carte pour poser votre repère.</p>'+
+    carteSVG()+
+    '<label class="lab">Un repère</label><input placeholder="Ex. : portail bleu en face de la pharmacie">'+
+    '<label class="lab">Votre WhatsApp</label><div class="tel"><span class="ind">+225</span><input placeholder="07 00 00 00 00"></div>'+
+    '<button class="btn" onclick="alert(\'Démonstration : le livreur reçoit le point et le repère.\')">Valider mon adresse</button>'+
+    '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+}
+</script>
+</body>
+</html>
