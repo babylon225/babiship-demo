@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BABI SHIP Livreur — Démonstration</title>
+<meta name="description" content="Application livreur BABI SHIP : tournée du jour, scan des colis, preuve photo, fonctionnement hors réseau.">
+<style>
+:root{
+  --vert:#0d6b45;--vert-fonce:#08502f;--vert-clair:#e6f4ed;
+  --orange:#e8622c;--orange-clair:#fdeee7;
+  --fond:#fff;--fond-2:#f4f6f5;--texte:#14201a;--doux:#5a6b62;--bord:#dce4e0;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --vert:#2f9d70;--vert-fonce:#247a57;--vert-clair:#12271e;--orange:#f07a4a;--orange-clair:#2a1a12;
+  --fond:#0e1512;--fond-2:#151e1a;--texte:#eef4f1;--doux:#9db0a6;--bord:#26332c;}}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fond-2);color:var(--texte);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.5}
+.wrap{width:100%;max-width:560px;margin:0 auto;padding:0 16px}
+
+.bandeau{background:var(--vert-fonce);color:#fff;font-size:13.5px;text-align:center;padding:9px 16px;line-height:1.4}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--vert);color:#fff}
+.bar{display:flex;align-items:center;justify-content:space-between;min-height:58px;gap:10px}
+.logo{font-weight:800;letter-spacing:.05em;font-size:16px}
+.logo small{display:block;font-weight:600;opacity:.85;font-size:12px;letter-spacing:.02em}
+.reseau{font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.18);cursor:pointer;border:0;color:#fff;font-family:inherit}
+.reseau.off{background:var(--orange)}
+
+.vue{display:none}.vue.on{display:block}
+.pad{padding:18px 0 40px}
+
+h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em}
+.sous{color:var(--doux);font-size:15px;margin:0 0 16px}
+
+.sync{display:flex;align-items:center;gap:10px;background:var(--orange-clair);border:1px solid var(--orange);color:var(--orange);border-radius:12px;padding:11px 14px;font-size:14.5px;font-weight:600;margin-bottom:14px}
+
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px}
+.stat{background:var(--fond);border:1px solid var(--bord);border-radius:14px;padding:12px 10px;text-align:center}
+.stat b{display:block;font-size:24px;line-height:1.1;color:var(--vert)}
+.stat span{font-size:12.5px;color:var(--doux)}
+
+.mission{display:flex;gap:12px;width:100%;text-align:left;background:var(--fond);border:1px solid var(--bord);border-left:5px solid var(--vert);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;font:inherit;font-family:inherit;color:var(--texte);min-height:80px;align-items:center}
+.mission.liv{border-left-color:var(--orange)}
+.mission.done{opacity:.5}
+.mission .ico{font-size:24px;width:32px;flex:0 0 auto;text-align:center}
+.mission .t{font-weight:700;font-size:16px;display:block}
+.mission .s{color:var(--doux);font-size:14px;display:block}
+.tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.04em;padding:3px 8px;border-radius:999px;background:var(--vert-clair);color:var(--vert);margin-bottom:3px}
+.tag.o{background:var(--orange-clair);color:var(--orange)}
+
+.carte{background:var(--fond);border:1px solid var(--bord);border-radius:16px;padding:16px;margin-bottom:12px}
+.carte h2{margin:0 0 10px;font-size:19px}
+.champ{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:15px;border-bottom:1px solid var(--bord)}
+.champ:last-child{border-bottom:0}
+.champ span{color:var(--doux);flex:0 0 auto}
+.champ b{text-align:right}
+.repere{background:var(--vert-clair);color:var(--vert);border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600;margin-top:10px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:58px;border:0;border-radius:14px;background:var(--vert);color:#fff;font:inherit;font-weight:700;font-size:17px;cursor:pointer;margin-top:10px;font-family:inherit}
+.btn:hover{background:var(--vert-fonce)}
+.btn:disabled{background:var(--bord);color:var(--doux);cursor:not-allowed}
+.btn-2{background:var(--fond);color:var(--vert);border:2px solid var(--vert)}
+.btn-2:hover{background:var(--vert-clair)}
+.btn-o{background:var(--orange)}
+.btn-o:hover{background:#c94f1f}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.duo .btn{margin-top:0}
+
+.retour{background:none;border:0;color:var(--vert);font:inherit;font-weight:700;cursor:pointer;padding:12px 0;font-family:inherit;font-size:15px}
+
+.map{width:100%;border-radius:14px;border:1px solid var(--bord);display:block;background:#e3ece5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .map{background:#182420}}
+
+.scan{background:#0c1210;border-radius:16px;padding:0;overflow:hidden;position:relative;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.viseur{width:72%;height:52%;border:3px solid #fff;border-radius:12px;position:relative;box-shadow:0 0 0 2000px rgba(0,0,0,.35)}
+.viseur::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:var(--orange)}
+.scan p{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#fff;font-size:14px;margin:0;opacity:.85}
+
+.photo{background:#0c1210;border-radius:16px;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:6px;position:relative}
+.photo .stamp{position:absolute;bottom:10px;left:10px;font-size:11.5px;background:rgba(0,0,0,.6);padding:5px 9px;border-radius:7px;line-height:1.35;text-align:left}
+
+.ok{background:var(--vert-clair);border:1px solid var(--vert);color:var(--vert);border-radius:12px;padding:12px 14px;font-weight:700;font-size:15px;margin-top:10px;display:flex;gap:9px;align-items:center}
+.note{background:#fff8e6;border:1px solid #f0dca8;color:#6b5312;border-radius:12px;padding:11px 14px;font-size:14px;margin-bottom:14px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .note{background:#2a2412;border-color:#4d411c;color:#e6d39a}}
+.fin{text-align:center;padding:40px 0}
+.fin .big{font-size:52px}
+</style>
+</head>
+<body>
+
+<div class="bandeau">Démonstration — application du livreur BABI SHIP · <a href="index.html" style="color:#fff">← Menu</a></div>
+
+<header><div class="wrap bar">
+  <div class="logo">BABI SHIP<small>Kouassi · Abidjan</small></div>
+  <button class="reseau" id="reseau" onclick="basculerReseau()">● En ligne</button>
+</div></header>
+
+<div class="vue on" id="v-liste"><div class="wrap pad">
+  <h1>Tournée du jour</h1>
+  <p class="sous" id="sousliste"></p>
+  <div id="syncZone"></div>
+  <div class="stats" id="stats"></div>
+  <div id="missions"></div>
+  <div class="note">Touchez le bouton « En ligne » en haut à droite pour simuler une perte de réseau : l'application continue de fonctionner.</div>
+</div></div>
+
+<div class="vue" id="v-detail"><div class="wrap pad">
+  <button class="retour" onclick="aller('liste')">← Tournée</button>
+  <div id="detail"></div>
+</div></div>
+
+<div class="vue" id="v-scan"><div class="wrap pad">
+  <button class="retour" onclick="ouvrir(courant)">← Retour</button>
+  <div id="scanZone"></div>
+</div></div>
+
+<div class="vue" id="v-photo"><div class="wrap pad">
+  <button class="retour" onclick="ouvrir(courant)">← Retour</button>
+  <div id="photoZone"></div>
+</div></div>
+
+<div class="vue" id="v-fin"><div class="wrap pad">
+  <div class="fin">
+    <div class="big">✅</div>
+    <h1>Tournée terminée</h1>
+    <p class="sous" id="finTexte"></p>
+  </div>
+  <button class="btn btn-2" onclick="recommencer()">Recommencer la démonstration</button>
+</div></div>
+
+<script>
+var M=[
+ {id:1,type:"collecte",num:"BS-230755",nom:"Aïcha Traoré",zone:"Cocody · Riviera 2",rep:"Portail bleu en face de la pharmacie",tel:"07 01 02 03 04",colis:"Un carton à chaussures · 7 kg",km:"1,2 km",h:"08:30",x:262,y:66},
+ {id:2,type:"collecte",num:"BS-114371",nom:"Boutique KENZA",zone:"Cocody · Angré",rep:"Boutique au rez-de-chaussée, enseigne rose",tel:"05 44 21 09 77",colis:"3 cartons vêtements · 18 kg",km:"3,4 km",h:"09:15",x:290,y:44},
+ {id:3,type:"livraison",num:"BS-884210",nom:"Moussa Koné",zone:"Marcory · Zone 4",rep:"Derrière la station-service, cour verte",tel:"01 77 30 55 12",colis:"Une valise cabine · 10 kg",km:"6,1 km",h:"11:00",x:224,y:150},
+ {id:4,type:"livraison",num:"BS-662108",nom:"Fatou Bamba",zone:"Treichville",rep:"Immeuble jaune, 2e étage, porte gauche",tel:"07 88 14 62 30",colis:"Une enveloppe · documents",km:"8,7 km",h:"12:30",x:118,y:160},
+ {id:5,type:"livraison",num:"BS-509933",nom:"Ibrahim Diallo",zone:"Yopougon · Niangon",rep:"Après le grand marché, maison à volets verts",tel:"05 12 47 88 01",colis:"Une grande valise · 23 kg",km:"14,2 km",h:"15:00",x:56,y:78}
+];
+var etat={}, courant=null, enLigne=true, attente=0;
+M.forEach(function(m){etat[m.id]={scan:false,photo:false,fait:false};});
+
+function aller(v){var l=document.querySelectorAll(".vue");for(var i=0;i<l.length;i++)l[i].classList.remove("on");document.getElementById("v-"+v).classList.add("on");window.scrollTo(0,0);}
+function heure(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);}
+function faits(){var n=0;M.forEach(function(m){if(etat[m.id].fait)n++;});return n;}
+
+function basculerReseau(){
+  enLigne=!enLigne;
+  var b=document.getElementById("reseau");
+  b.textContent = enLigne ? "● En ligne" : "● Hors réseau";
+  b.className = enLigne ? "reseau" : "reseau off";
+  if(enLigne) attente=0;
+  liste();
+}
+
+function liste(){
+  document.getElementById("sousliste").textContent = M.length+" missions · "+faits()+" terminées";
+  document.getElementById("syncZone").innerHTML = (!enLigne && attente>0)
+    ? '<div class="sync">⚠️ '+attente+' action'+(attente>1?"s":"")+' en attente · seront envoyées au retour du réseau</div>'
+    : (enLigne && faits()>0 ? '<div class="ok" style="margin:0 0 14px">✓ Tout est synchronisé</div>' : '');
+  var col=0,liv=0;
+  M.forEach(function(m){if(!etat[m.id].fait){m.type==="collecte"?col++:liv++;}});
+  document.getElementById("stats").innerHTML=
+    '<div class="stat"><b>'+col+'</b><span>collectes</span></div>'+
+    '<div class="stat"><b>'+liv+'</b><span>livraisons</span></div>'+
+    '<div class="stat"><b>'+faits()+'</b><span>terminées</span></div>';
+  var h="";
+  M.forEach(function(m){
+    var e=etat[m.id];
+    h+='<button class="mission '+(m.type==="livraison"?"liv":"")+(e.fait?" done":"")+'" onclick="ouvrir('+m.id+')">'+
+       '<span class="ico">'+(m.type==="collecte"?"📥":"📤")+'</span>'+
+       '<span><span class="tag '+(m.type==="livraison"?"o":"")+'">'+(m.type==="collecte"?"COLLECTE":"LIVRAISON")+' · '+m.h+'</span>'+
+       '<span class="t">'+m.nom+'</span><span class="s">'+m.zone+' · '+m.km+'</span></span>'+
+       '<span class="ico">'+(e.fait?"✅":"›")+'</span></button>';
+  });
+  document.getElementById("missions").innerHTML=h;
+}
+
+function carte(m){
+  return '<svg class="map" viewBox="0 0 360 200">'+
+  '<rect width="360" height="200" fill="#e3ece5"/>'+
+  '<path d="M0 118 H360 V150 H0 Z" fill="#bcd6e8"/><path d="M120 118 L150 150 L190 118 Z" fill="#bcd6e8"/>'+
+  '<path d="M40 40 H320 M180 20 V180 M90 60 L280 140" stroke="#fff" stroke-width="5"/>'+
+  '<g font-size="10.5" font-weight="700" fill="#4a5a52" font-family="sans-serif">'+
+  '<text x="150" y="30">Abobo</text><text x="105" y="62">Adjamé</text><text x="252" y="30">Cocody</text>'+
+  '<text x="16" y="66">Yopougon</text><text x="145" y="92">Plateau</text>'+
+  '<text x="92" y="180">Treichville</text><text x="214" y="176">Marcory</text>'+
+  '</g>'+
+  '<circle cx="'+m.x+'" cy="'+m.y+'" r="8" fill="#e8622c"/><circle cx="'+m.x+'" cy="'+m.y+'" r="3" fill="#fff"/>'+
+  '</svg>';
+}
+
+function ouvrir(id){
+  courant=id;
+  var m=null;M.forEach(function(x){if(x.id===id)m=x;});
+  var e=etat[id];
+  var estCol = m.type==="collecte";
+  var h='<h1>'+(estCol?"Collecte":"Livraison")+' · '+m.h+'</h1><p class="sous">'+m.num+'</p>';
+  h+='<div class="carte">'+carte(m)+
+     '<div class="repere">📍 '+m.rep+'</div>'+
+     '<button class="btn btn-2" onclick="simu(\'Ouvrirait la navigation vers le point.\')">🧭 Lancer la navigation</button>'+
+     '<div class="duo" style="margin-top:10px">'+
+       '<button class="btn btn-2" onclick="simu(\'Appellerait '+m.tel+'.\')">📞 Appeler</button>'+
+       '<button class="btn btn-2" onclick="simu(\'Ouvrirait WhatsApp.\')">💬 WhatsApp</button>'+
+     '</div></div>';
+  h+='<div class="carte"><h2>'+(estCol?"Expéditeur":"Destinataire")+'</h2>'+
+     '<div class="champ"><span>Nom</span><b>'+m.nom+'</b></div>'+
+     '<div class="champ"><span>Zone</span><b>'+m.zone+'</b></div>'+
+     '<div class="champ"><span>Téléphone</span><b>'+m.tel+'</b></div>'+
+     '<div class="champ"><span>Colis</span><b>'+m.colis+'</b></div></div>';
+
+  if(e.fait){
+    h+='<div class="ok">✅ Mission terminée · scan et photo enregistrés</div>'+
+       '<button class="btn btn-2" onclick="aller(\'liste\')">Revenir à la tournée</button>';
+  }else{
+    h+='<div class="carte"><h2>À faire</h2>'+
+       '<div class="champ"><span>1 · Scanner le colis</span><b>'+(e.scan?"✅ fait":"—")+'</b></div>'+
+       '<div class="champ"><span>2 · Photo de preuve</span><b>'+(e.photo?"✅ fait":"—")+'</b></div></div>';
+    h+='<button class="btn" onclick="aller(\'scan\');montrerScan()" '+(e.scan?'disabled':'')+'>📷 Scanner le colis</button>';
+    h+='<button class="btn" onclick="aller(\'photo\');montrerPhoto()" '+(e.scan&&!e.photo?'':'disabled')+'>📸 Photo de preuve</button>';
+    h+='<button class="btn btn-o" onclick="valider()" '+(e.scan&&e.photo?'':'disabled')+'>Valider la '+(estCol?"collecte":"remise")+'</button>';
+  }
+  document.getElementById("detail").innerHTML=h;
+  aller("detail");
+}
+
+function montrerScan(){
+  var m=null;M.forEach(function(x){if(x.id===courant)m=x;});
+  document.getElementById("scanZone").innerHTML=
+    '<h1>Scanner le colis</h1><p class="sous">Visez le code sur l\'étiquette.</p>'+
+    '<div class="scan"><div class="viseur"></div><p>Recherche du code…</p></div>'+
+    '<button class="btn" onclick="scanOk()">Simuler le scan</button>';
+}
+function scanOk(){
+  var m=null;M.forEach(function(x){if(x.id===courant)m=x;});
+  etat[courant].scan=true;
+  if(!enLigne)attente++;
+  document.getElementById("scanZone").innerHTML=
+    '<h1>Colis reconnu</h1>'+
+    '<div class="ok" style="font-size:20px;padding:20px">✅ '+m.num+'</div>'+
+    '<div class="carte"><div class="champ"><span>Contenu</span><b>'+m.colis+'</b></div>'+
+    '<div class="champ"><span>Heure</span><b>'+heure()+'</b></div></div>'+
+    (!enLigne?'<div class="sync">⚠️ Hors réseau · enregistré sur le téléphone</div>':'')+
+    '<button class="btn" onclick="ouvrir(courant)">Continuer</button>';
+}
+
+function montrerPhoto(){
+  document.getElementById("photoZone").innerHTML=
+    '<h1>Photo de preuve</h1><p class="sous">Photographiez le colis au moment de la remise.</p>'+
+    '<div class="photo"><div style="font-size:46px">📷</div><div style="opacity:.7;font-size:14px">Appareil photo</div></div>'+
+    '<button class="btn" onclick="photoOk()">Prendre la photo</button>';
+}
+function photoOk(){
+  var m=null;M.forEach(function(x){if(x.id===courant)m=x;});
+  etat[courant].photo=true;
+  if(!enLigne)attente++;
+  document.getElementById("photoZone").innerHTML=
+    '<h1>Photo enregistrée</h1>'+
+    '<div class="photo" style="background:#1d2a24"><div style="font-size:46px">📦</div>'+
+    '<div class="stamp">'+m.num+'<br>'+heure()+' · '+new Date().toLocaleDateString("fr-FR")+'<br>📍 '+m.zone+'</div></div>'+
+    '<div class="ok">✓ Horodatée et géolocalisée · sert de preuve en cas de litige</div>'+
+    (!enLigne?'<div class="sync">⚠️ Hors réseau · enregistrée sur le téléphone</div>':'')+
+    '<button class="btn" onclick="ouvrir(courant)">Continuer</button>';
+}
+
+function valider(){
+  etat[courant].fait=true;
+  if(!enLigne)attente++;
+  liste();
+  if(faits()===M.length){
+    document.getElementById("finTexte").textContent = M.length+" missions accomplies · scans et photos enregistrés.";
+    aller("fin");
+  }else{
+    aller("liste");
+  }
+}
+function simu(t){alert("Démonstration : "+t);}
+function recommencer(){M.forEach(function(m){etat[m.id]={scan:false,photo:false,fait:false};});attente=0;liste();aller("liste");}
+
+liste();
+</script>
+</body>
+</html>
