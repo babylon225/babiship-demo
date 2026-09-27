@@ -183,7 +183,7 @@ footer{border-top:1px solid var(--bord);padding:24px 0 40px;color:var(--doux);fo
 
   <section>
     <h2 class="titre">Questions fréquentes</h2>
-    <details><summary>Combien de temps dure la livraison ?</summary><p>Le colis part sous 48 h après la commande. Comptez ensuite 6 jours ouvrés vers Abidjan et 7 jours ouvrés vers la France. La date exacte est annoncée avant le paiement.</p></details>
+    <details><summary>Combien de temps dure la livraison ?</summary><p>Le colis part sous 48 h après la commande. Comptez ensuite 5 jours ouvrés vers Abidjan et 4 jours ouvrés vers la France. La date exacte est annoncée avant le paiement.</p></details>
     <details><summary>Y a-t-il des frais à payer à la livraison ?</summary><p>Non. Le prix affiché au moment de la commande est le prix total. Le destinataire n'a rien à régler.</p></details>
     <details><summary>Et si le destinataire n'a pas d'adresse précise ?</summary><p>C'est prévu. Il reçoit un lien WhatsApp et pose lui-même un repère sur la carte, avec un point de repère en texte.</p></details>
     <details><summary>Comment puis-je payer ?</summary><p>Carte bancaire depuis la France. Wave, Orange Money et MTN Money depuis la Côte d'Ivoire.</p></details>
@@ -218,19 +218,30 @@ var CONTENUS=[
  {id:"cad",i:"🎁",n:"Cadeaux, divers"}
 ];
 var TAILLES=[
- {id:"env",i:"✉️",n:"Une enveloppe",d:"Papiers, photos",p:15},
- {id:"ch", i:"👟",n:"Une paire de chaussures",d:"Jusqu'à 2 kg",p:25},
- {id:"ct", i:"📦",n:"Un carton à chaussures",d:"Plusieurs paires, jusqu'à 7 kg",p:55},
- {id:"vc", i:"🧳",n:"Une valise cabine",d:"Jusqu'à 10 kg",p:75},
- {id:"gv", i:"🧳",n:"Une grande valise",d:"Jusqu'à 23 kg",p:150},
+ {id:"env",i:"✉️",n:"Une enveloppe",d:"Papiers, photos",kg:0.5,cm:[32,23,2]},
+ {id:"ch", i:"👟",n:"Une paire de chaussures",d:"Jusqu'à 2 kg",kg:1.5,cm:[35,25,13]},
+ {id:"ct", i:"📦",n:"Un carton à chaussures",d:"Plusieurs paires, jusqu'à 7 kg",kg:6,cm:[40,35,30]},
+ {id:"vc", i:"🧳",n:"Une valise cabine",d:"Jusqu'à 10 kg",kg:10,cm:[55,40,20]},
+ {id:"gv", i:"🧳",n:"Une grande valise",d:"Jusqu'à 23 kg",kg:23,cm:[75,50,30]},
  {id:"pg", i:"🚚",n:"Plus gros",d:"On vous fait un devis",p:null}
 ];
-var POINTS=[
+var POINTS_FR=[
+ {n:"BABI SHIP Château-Rouge",q:"Paris 18e · 1,2 km"},
+ {n:"BABI SHIP Saint-Denis Basilique",q:"Saint-Denis · 3,4 km"},
+ {n:"BABI SHIP Croix-de-Chavaux",q:"Montreuil · 5,1 km"}
+];
+var POINTS_CI=[
  {n:"BABI SHIP Riviera 2",q:"Cocody · 1,5 km"},
  {n:"BABI SHIP Zone 4",q:"Marcory · 4,2 km"},
  {n:"BABI SHIP Liberté",q:"Adjamé · 6,8 km"}
 ];
-var STATUTS=["Colis enregistré","Colis pris en charge","Au centre de départ","En vol","Arrivé à destination","En cours de livraison","Livré"];
+/* Tarifs et délais : mêmes valeurs que l'application (lib/tarifs.ts du dépôt babiship), provisoires « À CONFIRMER ».
+   Montants dans la devise du départ : euros depuis la France, FCFA depuis Abidjan. */
+var GRILLE={diviseur:6000,pasKg:0.5,minKg:0.5,
+ fr:{fixe:9,parKg:8,arrondi:1,delai:7},     /* France → Abidjan : 2 jours ouvrés avant départ + 5 d'acheminement */
+ ci:{fixe:6000,parKg:5500,arrondi:100,delai:6} /* Abidjan → France : 2 jours ouvrés avant départ + 4 d'acheminement */
+};
+function statuts(depFr){return ["Colis enregistré","Colis pris en charge","Au centre de départ, "+(depFr?"France":"Abidjan"),"En vol","Arrivé "+(depFr?"à Abidjan":"en France"),"En cours de livraison","Livré"];}
 var ICO=["📝","📦","🏢","✈️","🛬","🛵","✅"];
 
 var E={sens:null,contenu:null,taille:null,remise:null,adresse:null,complement:"",pin:null,repere:"",point:null,tel:"",prix:null,date:null,num:null};
@@ -241,7 +252,14 @@ function joursOuvres(n){var d=new Date(),a=0;while(a<n){d.setDate(d.getDate()+1)
 function dateTexte(d){var J=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"],M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];return J[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];}
 function esp(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ");}
 function versCI(){return E.sens==="fr";}
-function fmtPrix(eur){return versCI()? eur+" €" : esp(Math.round(eur*655.957/100)*100)+" FCFA";}
+function fmtPrix(m){return versCI()? m+" €" : esp(m)+" FCFA";}
+function auDessus(v,pas){return Number((Math.ceil(Number((v/pas).toFixed(9)))*pas).toFixed(9));}
+function grille(){return versCI()?GRILLE.fr:GRILLE.ci;}
+function prixPour(t){
+  var vol=t.cm[0]*t.cm[1]*t.cm[2]/GRILLE.diviseur;
+  var kg=Math.max(auDessus(Math.max(t.kg,vol),GRILLE.pasKg),GRILLE.minKg);
+  var g=grille(); return auDessus(g.fixe+g.parKg*kg,g.arrondi);
+}
 function indicatif(){return versCI()?"+33":"+225";}
 function trouve(t,id){for(var i=0;i<t.length;i++)if(t[i].id===id)return t[i];return null;}
 function aller(v){
@@ -287,7 +305,7 @@ function ecran(n){
   }
   if(n===4){
     var t=trouve(TAILLES,E.taille);
-    if(t && t.p===null){
+    if(t && t.id==="pg"){
       return '<h2>Demande de devis</h2>'+
         '<label class="lab">Votre nom</label><input placeholder="Ex. : Awa K.">'+
         '<label class="lab">Votre WhatsApp</label><div class="tel"><span class="ind">'+indicatif()+'</span><input placeholder="07 00 00 00 00"></div>'+
@@ -295,10 +313,10 @@ function ecran(n){
         '<button class="btn" onclick="aller(\'accueil\')">Envoyer ma demande</button>'+
         '<p class="aide" style="text-align:center">Nous vous répondons sur WhatsApp sous 2 heures ouvrées.</p>';
     }
-    E.prix=t.p; E.date=dateTexte(joursOuvres(versCI()?6:7));
+    E.prix=prixPour(t); E.date=dateTexte(joursOuvres(grille().delai));
     var c=trouve(CONTENUS,E.contenu);
     return '<h2>Votre prix</h2>'+
-      '<div class="prix-boite"><span class="prix">'+fmtPrix(t.p)+'</span><p class="prix-note">Tout compris · collecte incluse</p></div>'+
+      '<div class="prix-boite"><span class="prix">'+fmtPrix(E.prix)+'</span><p class="prix-note">Tout compris · collecte incluse</p></div>'+
       '<div class="info">Livré '+(versCI()?"à Abidjan":"en France")+' le <strong>'+E.date+'</strong></div>'+
       '<div class="recap">'+
         '<div><span>Trajet</span><b>'+(versCI()?"France → Abidjan":"Abidjan → France")+'</b></div>'+
@@ -317,7 +335,7 @@ function ecran(n){
   if(n===6){
     if(E.remise==="depot"){
       var h='<h2>Où déposez-vous le colis ?</h2>';
-      POINTS.forEach(function(p,i){h+=lig("point",String(i),"📍",p.n,p.q);});
+      (versCI()?POINTS_FR:POINTS_CI).forEach(function(p,i){h+=lig("point",String(i),"📍",p.n,p.q);});
       return h+cont(E.point);
     }
     if(versCI()){
@@ -413,12 +431,13 @@ function terminer(){
 /* ---------- suivi ---------- */
 var avance=2;
 function rendreSuivi(){
-  var num=E.num||"BS-230755", d=E.date||dateTexte(joursOuvres(6));
+  var num=E.num||"BS-230755", d=E.date||dateTexte(joursOuvres(GRILLE.fr.delai));
   var h='<h2>Suivi du colis</h2>'+
     '<div class="bandeau-vert"><small>Numéro de suivi</small><span class="num">'+num+'</span><small>'+(E.sens?(versCI()?"France → Abidjan":"Abidjan → France"):"France → Abidjan")+' · livraison prévue le '+d+'</small></div>'+
     '<button class="btn" onclick="alert(\'Démonstration : ouvrirait WhatsApp avec le lien de suivi.\')">Partager sur WhatsApp</button>'+
     '<button class="btn btn-2" onclick="copier(this)">Copier le numéro</button>'+
     '<ul class="tl">';
+  var STATUTS=statuts(!E.sens||versCI());
   STATUTS.forEach(function(s,i){
     h+='<li class="'+(i<avance?"ok":"")+'"><span class="rond">'+ICO[i]+'</span><span><b>'+s+'</b>'+(i<avance?'<span>Aujourd\'hui</span>':(i===STATUTS.length-1?'<span>Prévu le '+d+'</span>':''))+'</span></li>';
   });
@@ -426,7 +445,7 @@ function rendreSuivi(){
      '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
   document.getElementById("suivi").innerHTML=h;
 }
-function avancer(){ avance = avance>=STATUTS.length ? 1 : avance+1; rendreSuivi(); }
+function avancer(){ avance = avance>=ICO.length ? 1 : avance+1; rendreSuivi(); }
 function copier(b){ b.textContent="Numéro copié ✓"; setTimeout(function(){b.textContent="Copier le numéro";},1800); }
 
 /* ---------- vue destinataire ---------- */
@@ -434,7 +453,7 @@ function rendreDest(){
   document.getElementById("dest").innerHTML=
     '<div class="note">Voici la page que reçoit le destinataire par WhatsApp. Aucun compte, aucune application.</div>'+
     '<h2>Un colis arrive pour vous</h2>'+
-    '<div class="bloc">📦 Colis '+(E.num||"BS-230755")+' · arrivée prévue le '+(E.date||dateTexte(joursOuvres(6)))+'</div>'+
+    '<div class="bloc">📦 Colis '+(E.num||"BS-230755")+' · arrivée prévue le '+(E.date||dateTexte(joursOuvres(GRILLE.fr.delai)))+'</div>'+
     '<p class="aide" style="margin:18px 0 10px">Indiquez où vous livrer. Touchez la carte pour poser votre repère.</p>'+
     carteSVG()+
     '<label class="lab">Un repère</label><input placeholder="Ex. : portail bleu en face de la pharmacie">'+
