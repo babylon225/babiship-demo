@@ -196,7 +196,7 @@ footer{border-top:1px solid var(--bord);padding:24px 0 40px;color:var(--doux);fo
     <details><summary>Combien de temps puis-je laisser le colis avant de le retirer ?</summary><p>48 heures de stockage sont offertes après l'arrivée à notre centre. Au-delà, un forfait journalier s'applique.</p></details>
     <details><summary>Le retrait sur place est-il payant ?</summary><p>Non. Il est compris dans le prix réglé au départ. Rien à payer en venant chercher le colis.</p></details>
     <details><summary>Puis-je choisir mon transporteur pour la livraison finale ?</summary><p>Oui. DPD, Chronopost, UPS : vous choisissez, le prix est affiché, et tout est payé en une seule fois.</p></details>
-    <details><summary>Que puis-je envoyer ?</summary><p>Vêtements, chaussures, denrées sèches, sauces sans viande ni lait, cosmétiques, appareils, artisanat. La viande, le lait, les fruits frais et l'alcool sont refusés. Voir la liste complète.</p></details><details><summary>Et si le destinataire n'a pas d'adresse précise ?</summary><p>Il reçoit un lien WhatsApp et pose lui-même son repère sur la carte.</p></details>
+    <details><summary>Que puis-je envoyer ?</summary><p>Vêtements, chaussures, denrées sèches, sauces sans viande ni lait, cosmétiques, appareils, artisanat. La viande, le lait, les fruits frais et l'alcool sont refusés. Voir la liste complète.</p></details><details><summary>Et si le destinataire n'a pas d'adresse précise ?</summary><p>Nous lui envoyons un lien WhatsApp : il pose lui-même son repère sur la carte, ou partage sa position GPS, et ajoute un point de repère.</p></details>
   </section>
 </div></div>
 
@@ -581,7 +581,9 @@ function terminer(moyen){
   var base=
     '<div class="bloc">🛬 Arrivée à notre centre '+deV(ville())+' le <b>'+dTxt(v.arr)+'</b></div>'+
     '<div class="bloc">'+s.i+' <b>'+s.n+'</b><br>'+(s.id==="ret"?adresseRetrait():(s.note?s.note:s.d))+'</div>'+
-    '<div class="bloc">👤 Destinataire : <b>'+att(E.nomDest)+'</b> · WhatsApp '+indArr()+' '+att(E.telDest)+'</div>';
+    '<div class="bloc">👤 Destinataire : <b>'+att(E.nomDest)+'</b> · WhatsApp '+indArr()+' '+att(E.telDest)+'</div>'+
+    (s.id!=="ret"?'<a class="btn btn-2" href="https://wa.me/'+intl(indArr(),E.telDest)+'?text='+encodeURIComponent(msgLienDest())+'" target="_blank" rel="noopener">📍 Envoyer le lien de livraison au destinataire</a>'+
+      '<p class="aide" style="text-align:center">Le destinataire indique lui-même où livrer, depuis son téléphone.</p>':'');
   var liens=
     '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
 
@@ -689,17 +691,82 @@ function rendreMentions(){
 }
 rendreMentions();
 
-function rendreDest(){
-  document.getElementById("dest").innerHTML=
-    '<div class="note">Voici la page que reçoit le destinataire par WhatsApp. Aucun compte, aucune application.</div>'+
-    '<h2>Un colis arrive pour vous</h2>'+
-    '<div class="bloc">📦 Colis '+(E.num||"BS-230755")+'</div>'+
-    '<p class="aide" style="margin:18px 0 10px">Indiquez où vous livrer. Touchez la carte pour poser votre repère.</p>'+carteSVG()+
-    '<label class="lab">Un repère</label><input placeholder="Ex. : portail bleu en face de la pharmacie">'+
-    '<label class="lab">Votre WhatsApp</label><div class="tel"><span class="ind">+225</span><input placeholder="07 00 00 00 00"></div>'+
-    '<button class="btn" onclick="alert(\'Merci ! Le livreur a bien reçu votre point de repère.\')">Valider mon adresse</button>'+
-    '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+// ===== Page destinataire : babiship.com/?dest=BS-XXXXXX&v=Abidjan =====
+function intl(ind,tel){var d=String(tel||"").replace(/\D/g,"");if(ind==="+33"&&d.charAt(0)==="0")d=d.slice(1);return ind.replace("+","")+d;}
+function msgLienDest(){
+  return "Bonjour "+E.nomDest+", "+E.nomExp+" vous envoie un colis avec BABI SHIP (n° "+E.num+").\n"+
+    "Pour être livré(e), indiquez votre adresse ici : https://babiship.com/?dest="+E.num+"&v="+encodeURIComponent(ville());
 }
+var D={num:"",v:"Abidjan",lat:null,lng:null,carte:null,pin:null};
+var COMMUNES=["Abobo","Adjamé","Anyama","Attécoubé","Bingerville","Cocody","Koumassi","Marcory","Plateau","Port-Bouët","Songon","Treichville","Yopougon"];
+function chargerLeaflet(cb){
+  if(window.L&&window.L.map)return cb();
+  var c=document.createElement("link");c.rel="stylesheet";c.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";document.head.appendChild(c);
+  var s=document.createElement("script");s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";s.onload=cb;
+  s.onerror=function(){var m=document.getElementById("d-carte");if(m)m.innerHTML='<p class="aide" style="padding:14px">Carte indisponible : utilisez le bouton « Utiliser ma position » ci-dessous.</p>';};
+  document.head.appendChild(s);
+}
+function poserD(lat,lng,zoom){
+  D.lat=Math.round(lat*1e6)/1e6;D.lng=Math.round(lng*1e6)/1e6;
+  if(D.carte){if(D.pin)D.pin.setLatLng([lat,lng]);else D.pin=L.marker([lat,lng]).addTo(D.carte);if(zoom)D.carte.setView([lat,lng],17);}
+  var i=document.getElementById("d-pin");if(i)i.textContent="📍 Position enregistrée";
+  majD();
+}
+function maPosition(b){
+  if(!navigator.geolocation){alert("Votre téléphone ne permet pas de partager la position. Posez le repère sur la carte.");return;}
+  b.textContent="Recherche de votre position…";
+  navigator.geolocation.getCurrentPosition(function(p){b.textContent="📡 Utiliser ma position";poserD(p.coords.latitude,p.coords.longitude,true);},
+    function(){b.textContent="📡 Utiliser ma position";alert("Position non disponible. Touchez la carte pour poser votre repère.");},{enableHighAccuracy:true,timeout:15000});
+}
+function dOk(){
+  if(!(val("d-nom").trim().length>=2&&val("d-tel").replace(/\s/g,"").length>=6))return false;
+  if(D.v==="Abidjan")return D.lat!==null&&val("d-commune")!==""&&val("d-rep").trim().length>=3;
+  return val("d-adr").trim().length>=3&&val("d-cp").trim().length>=4&&val("d-ville").trim().length>=2;
+}
+function majD(){var b=document.getElementById("btn-d");if(b)b.disabled=!dOk();}
+function envoyerD(){
+  if(!dOk())return;
+  var ind=D.v==="Abidjan"?"+225":"+33";
+  var t="ADRESSE DE LIVRAISON BABI SHIP\nColis : "+D.num+"\n\nDestinataire : "+val("d-nom").trim()+" — "+ind+" "+val("d-tel").trim()+"\n";
+  if(D.v==="Abidjan") t+="Commune : "+val("d-commune")+"\nRepère : "+val("d-rep").trim()+"\nPosition GPS : https://maps.google.com/?q="+D.lat+","+D.lng;
+  else t+="Adresse : "+val("d-adr").trim()+", "+val("d-cp").trim()+" "+val("d-ville").trim()+(val("d-compl").trim()?" — "+val("d-compl").trim():"");
+  window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(t),"_blank","noopener");
+  document.getElementById("d-merci").style.display="block";
+}
+function rendreDest(){
+  var abj=D.v==="Abidjan",h=
+    '<h2>Un colis arrive pour vous</h2>'+
+    '<div class="bloc">📦 Colis <b>'+att(D.num)+'</b> · arrivée à '+att(D.v)+'</div>'+
+    '<label class="lab">Votre nom et prénom</label><input id="d-nom" placeholder="Prénom Nom" autocomplete="name" oninput="majD()">'+
+    '<label class="lab">Votre WhatsApp</label><div class="tel"><span class="ind">'+(abj?"+225":"+33")+'</span><input id="d-tel" inputmode="tel" placeholder="'+(abj?"07 00 00 00 00":"06 00 00 00 00")+'" oninput="majD()"></div>';
+  if(abj){
+    h+='<p class="aide" style="margin:18px 0 10px">Indiquez où vous livrer : touchez la carte pour poser votre repère, ou utilisez votre position.</p>'+
+      '<div id="d-carte" style="height:300px;border-radius:14px;border:2px solid var(--bord);overflow:hidden;background:var(--fond-2)"></div>'+
+      '<button class="btn btn-2" type="button" onclick="maPosition(this)">📡 Utiliser ma position</button>'+
+      '<p class="pin-info" id="d-pin">Aucun repère posé</p>'+
+      '<label class="lab">Commune</label><select id="d-commune" onchange="majD()" style="width:100%;min-height:56px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);font:inherit;padding:14px"><option value="">Choisissez…</option>'+
+      COMMUNES.map(function(c){return '<option>'+c+'</option>';}).join("")+'</select>'+
+      '<label class="lab">Un point de repère</label><input id="d-rep" placeholder="Ex. : portail bleu en face de la pharmacie" oninput="majD()">';
+  }else{
+    h+='<label class="lab">Adresse</label><input id="d-adr" placeholder="Numéro et rue" autocomplete="street-address" oninput="majD()">'+
+      '<label class="lab">Code postal</label><input id="d-cp" inputmode="numeric" placeholder="75000" autocomplete="postal-code" oninput="majD()">'+
+      '<label class="lab">Ville</label><input id="d-ville" placeholder="Ville" autocomplete="address-level2" oninput="majD()">'+
+      '<label class="lab">Complément <span style="font-weight:400;color:var(--doux)">(facultatif)</span></label><input id="d-compl" placeholder="Étage, digicode, bâtiment" oninput="majD()">';
+  }
+  h+='<button class="btn" id="btn-d" onclick="envoyerD()" disabled>Envoyer mon adresse sur WhatsApp</button>'+
+    '<div class="info" id="d-merci" style="display:none;margin-top:14px">✅ Merci ! Envoyez le message WhatsApp qui s\'est ouvert : nous vous recontactons pour convenir du créneau.</div>'+
+    '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+  document.getElementById("dest").innerHTML=h;
+  if(abj)chargerLeaflet(function(){
+    D.carte=L.map("d-carte").setView([5.345,-4.02],12);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(D.carte);
+    D.pin=null;D.carte.on("click",function(e){poserD(e.latlng.lat,e.latlng.lng,false);});
+  });
+}
+(function(){
+  var q=new URLSearchParams(location.search),n=q.get("dest");
+  if(n&&/^BS-\d{6}$/i.test(n)){D.num=n.toUpperCase();D.v=q.get("v")==="Paris"||q.get("v")==="Lille"?q.get("v"):"Abidjan";aller("dest");}
+})();
 </script>
 </body>
 </html>
