@@ -3,98 +3,80 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BABI SHIP — Démonstration du parcours client</title>
-<meta name="description" content="Découvrez le parcours complet d'un envoi de colis entre la France et Abidjan : prix ferme, collecte, suivi WhatsApp.">
+<title>BABI SHIP — Envoyer un colis entre la France et Abidjan</title>
+<meta name="description" content="Envoyez un colis entre la France et Abidjan : choisissez votre vol, choisissez comment récupérer le colis, prix ferme tout compris.">
 <style>
 :root{
-  --vert:#0d6b45;--vert-fonce:#08502f;--vert-clair:#e6f4ed;
+  --vert:#0d6b45;--vert-fonce:#08502f;--vert-clair:#e6f4ed;--orange:#e8622c;--orange-clair:#fdeee7;
   --fond:#fff;--fond-2:#f6f8f7;--texte:#14201a;--doux:#5a6b62;--bord:#dde5e1;
-  --ombre:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.05);
   box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --vert:#2f9d70;--vert-fonce:#247a57;--vert-clair:#12271e;
-  --fond:#0e1512;--fond-2:#141d19;--texte:#eef4f1;--doux:#9db0a6;--bord:#26332c;
-  --ombre:0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);}}
-:root[data-theme="dark"]{--vert:#2f9d70;--vert-fonce:#247a57;--vert-clair:#12271e;--fond:#0e1512;--fond-2:#141d19;--texte:#eef4f1;--doux:#9db0a6;--bord:#26332c;}
+  --vert:#2f9d70;--vert-fonce:#247a57;--vert-clair:#12271e;--orange:#f07a4a;--orange-clair:#2a1a12;
+  --fond:#0e1512;--fond-2:#141d19;--texte:#eef4f1;--doux:#9db0a6;--bord:#26332c;}}
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:70px}
-body{margin:0;background:var(--fond);color:var(--texte);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--fond);color:var(--texte);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.55}
 .wrap{width:100%;max-width:640px;margin:0 auto;padding:0 20px}
-
-.bandeau{background:var(--vert-fonce);color:#fff;font-size:13.5px;text-align:center;padding:9px 16px;line-height:1.4}
+.bandeau{background:var(--vert-fonce);color:#fff;font-size:13.5px;text-align:center;padding:9px 16px}
+.bandeau a{color:#fff}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--fond);border-bottom:1px solid var(--bord)}
 .bar{display:flex;align-items:center;justify-content:space-between;height:58px}
 .logo{font-weight:800;letter-spacing:.06em;color:var(--vert);font-size:18px;background:none;border:0;cursor:pointer;font-family:inherit;padding:0}
-.mini{font-weight:600;font-size:14px;color:var(--doux);background:none;border:1px solid var(--bord);border-radius:9px;padding:9px 12px;cursor:pointer;font-family:inherit}
-.mini:hover{border-color:var(--vert);color:var(--vert)}
-
-.vue{display:none}
-.vue.on{display:block}
-
+.mini{font-weight:600;font-size:14px;color:var(--doux);background:none;border:1px solid var(--bord);border-radius:9px;padding:9px 12px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block}
+.vue{display:none}.vue.on{display:block}
 h1{font-size:31px;line-height:1.2;margin:0 0 12px;letter-spacing:-.02em}
-h2.titre{font-size:23px;margin:0 0 16px;letter-spacing:-.01em}
+h2.titre{font-size:23px;margin:0 0 16px}
 .chapo{color:var(--doux);margin:0 0 20px}
 .puces{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:0;list-style:none}
 .puces li{font-size:14px;font-weight:600;background:var(--vert-clair);color:var(--vert);padding:7px 12px;border-radius:999px}
 .hero{padding:30px 0 6px}
 section{padding:36px 0}
-
-/* boutons */
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border:0;border-radius:14px;background:var(--vert);color:#fff;font:inherit;font-weight:700;font-size:17px;cursor:pointer;margin-top:14px;font-family:inherit}
 .btn:hover{background:var(--vert-fonce)}
 .btn:disabled{background:var(--bord);color:var(--doux);cursor:not-allowed}
 .btn-2{background:transparent;color:var(--vert);border:2px solid var(--vert)}
 .btn-2:hover{background:var(--vert-clair)}
-
-/* choix */
 .grille2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grille3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .opt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:78px;padding:12px 8px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);cursor:pointer;font:inherit;font-weight:700;font-size:15px;text-align:center;line-height:1.25;font-family:inherit}
 .opt:hover{border-color:var(--vert)}
 .opt[aria-pressed="true"]{border-color:var(--vert);background:var(--vert-clair);color:var(--vert)}
 .opt .gros{font-size:24px}
-.ligne{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:12px 14px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);cursor:pointer;font:inherit;text-align:left;margin-bottom:10px;font-family:inherit}
+.ligne{display:flex;align-items:center;gap:13px;width:100%;min-height:66px;padding:13px 14px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);cursor:pointer;font:inherit;text-align:left;margin-bottom:10px;font-family:inherit}
 .ligne:hover{border-color:var(--vert)}
 .ligne[aria-pressed="true"]{border-color:var(--vert);background:var(--vert-clair)}
-.ligne .ico{font-size:25px;flex:0 0 auto;width:32px;text-align:center}
+.ligne .ico{font-size:24px;flex:0 0 auto;width:30px;text-align:center}
 .ligne .nom{font-weight:700;font-size:16px;display:block}
-.ligne .det{color:var(--doux);font-size:14px}
+.ligne .det{color:var(--doux);font-size:14px;display:block;line-height:1.4}
 .ligne[aria-pressed="true"] .det{color:var(--vert)}
-
-/* parcours */
-.pbar{display:flex;gap:5px;padding:12px 0 2px}
+.ligne .tarif{margin-left:auto;font-weight:800;font-size:15px;color:var(--vert);flex:0 0 auto;text-align:right;line-height:1.25;white-space:nowrap}
+.ligne .tarif small{display:block;font-weight:600;font-size:11.5px;color:var(--doux)}
+.pbar{display:flex;gap:4px;padding:12px 0 2px}
 .pbar i{flex:1;height:5px;border-radius:3px;background:var(--bord)}
 .pbar i.f{background:var(--vert)}
 .etape{padding:6px 0 30px}
-.etape h2{font-size:25px;margin:14px 0 18px;letter-spacing:-.01em;line-height:1.25}
+.etape h2{font-size:25px;margin:14px 0 18px;line-height:1.25}
 .retour{background:none;border:0;color:var(--vert);font:inherit;font-weight:700;cursor:pointer;padding:6px 0;font-family:inherit;font-size:15px}
-
-/* prix */
 .prix-boite{background:var(--vert);color:#fff;border-radius:16px;padding:22px}
-.prix{font-size:42px;font-weight:800;line-height:1;letter-spacing:-.02em;display:block;margin-bottom:8px}
+.prix{font-size:40px;font-weight:800;line-height:1;display:block;margin-bottom:8px}
 .prix-note{font-size:15px;opacity:.92;margin:0}
 .info{background:var(--vert-clair);color:var(--vert);border-radius:14px;padding:14px 16px;margin-top:12px;font-size:15px}
 .info strong{display:block;font-size:17px}
-.recap{margin-top:18px;border-top:1px solid var(--bord);padding-top:14px}
+.recap{margin-top:16px;border-top:1px solid var(--bord);padding-top:12px}
 .recap div{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:15px}
 .recap span{color:var(--doux)}
-
-/* champs */
+.recap div.tot{border-top:2px solid var(--bord);margin-top:8px;padding-top:12px;font-size:19px;font-weight:800}
+.recap div.tot span{color:var(--texte)}
 label.lab{display:block;font-weight:700;font-size:15px;margin:16px 0 8px}
 input,textarea{width:100%;min-height:56px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);font:inherit;padding:14px;font-family:inherit}
 input:focus,textarea:focus{outline:none;border-color:var(--vert)}
-textarea{min-height:110px;resize:vertical}
+textarea{min-height:110px}
 .tel{display:flex;gap:10px}
 .tel .ind{flex:0 0 auto;display:flex;align-items:center;padding:0 14px;border:2px solid var(--bord);border-radius:14px;font-weight:700;background:var(--fond-2)}
 .aide{color:var(--doux);font-size:14.5px;margin:8px 0 0}
-
-/* carte */
-.carte-svg{width:100%;border-radius:14px;border:1px solid var(--bord);display:block;cursor:crosshair;background:#e8efe9}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .carte-svg{background:#182420}}
+.map{width:100%;border-radius:14px;border:1px solid var(--bord);display:block;background:#e3ece5;cursor:crosshair}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .map{background:#182420}}
 .pin-info{margin-top:10px;font-weight:700;color:var(--vert);font-size:15px}
-
-/* suivi */
 .tl{list-style:none;margin:20px 0 0;padding:0}
 .tl li{display:flex;gap:14px;padding:0 0 22px;position:relative}
 .tl li::before{content:"";position:absolute;left:17px;top:36px;bottom:0;width:2px;background:var(--bord)}
@@ -102,25 +84,20 @@ textarea{min-height:110px;resize:vertical}
 .tl .rond{flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:var(--fond-2);border:2px solid var(--bord);display:flex;align-items:center;justify-content:center;font-size:17px}
 .tl li.ok .rond{background:var(--vert-clair);border-color:var(--vert)}
 .tl li.ok b{color:var(--vert)}
-.tl b{display:block;font-size:16px}
-.tl span{color:var(--doux);font-size:14.5px}
-
-.bloc{background:var(--fond-2);border:1px solid var(--bord);border-radius:16px;padding:18px;margin-top:14px}
+.tl b{display:block;font-size:16px}.tl span{color:var(--doux);font-size:14.5px}
+.bloc{background:var(--fond-2);border:1px solid var(--bord);border-radius:16px;padding:16px;margin-top:12px;font-size:15.5px}
 .bandeau-vert{background:var(--vert);color:#fff;border-radius:16px;padding:20px}
 .bandeau-vert .num{font-size:30px;font-weight:800;letter-spacing:.04em;display:block;margin:4px 0}
 .bandeau-vert small{opacity:.9;font-size:14.5px}
-
 .etapes{list-style:none;margin:0;padding:0;counter-reset:e}
 .etapes li{counter-increment:e;display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--bord)}
 .etapes li:last-child{border-bottom:0}
 .etapes li::before{content:counter(e);flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:var(--vert-clair);color:var(--vert);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
-.etapes b{display:block;font-size:16px}
-.etapes span{color:var(--doux);font-size:15px}
+.etapes b{display:block;font-size:16px}.etapes span{color:var(--doux);font-size:15px}
 .cartes{display:grid;gap:12px}
 @media (min-width:620px){.cartes{grid-template-columns:1fr 1fr}h1{font-size:38px}}
 .cc{background:var(--fond-2);border:1px solid var(--bord);border-radius:14px;padding:16px}
-.cc b{display:block;margin-bottom:4px;font-size:16px}
-.cc span{color:var(--doux);font-size:15px}
+.cc b{display:block;margin-bottom:4px;font-size:16px}.cc span{color:var(--doux);font-size:15px}
 details{border-bottom:1px solid var(--bord);padding:14px 0}
 summary{font-weight:700;cursor:pointer;font-size:16px;list-style:none}
 summary::-webkit-details-marker{display:none}
@@ -130,47 +107,79 @@ details p{color:var(--doux);margin:10px 0 0;font-size:15px}
 .marques{background:var(--vert-clair);border-radius:18px;padding:22px}
 .marques h2{margin-top:0;color:var(--vert)}
 footer{border-top:1px solid var(--bord);padding:24px 0 40px;color:var(--doux);font-size:14px}
+.poids-box{display:flex;align-items:center;justify-content:center;gap:20px;margin:10px 0 16px}
+.pm{width:58px;height:58px;border-radius:50%;border:2px solid var(--vert);background:var(--fond);color:var(--vert);font-size:28px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1}
+.pm:hover{background:var(--vert-clair)}
+.pv{font-size:34px;font-weight:800;min-width:120px;text-align:center}
+.pv b{font-size:44px;color:var(--vert)}
+.slider{width:100%;height:40px;accent-color:var(--vert);background:transparent;border:0;padding:0;min-height:0}
+.reperes{display:flex;gap:7px;margin-top:14px;overflow-x:auto;padding-bottom:4px}
+.rep{flex:0 0 auto;min-width:78px;min-height:74px;border:2px solid var(--bord);border-radius:12px;background:var(--fond);color:var(--texte);cursor:pointer;font-family:inherit;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.rep:hover{border-color:var(--vert)}
+.rep span{font-size:21px}
+.rep small{font-size:11.5px;color:var(--doux);line-height:1.3;text-align:center}
+.reg{border-radius:14px;padding:14px 16px;margin-bottom:10px;font-size:15px}
+.reg b{display:block;margin-bottom:6px;font-size:15.5px}
+.reg ul{margin:0;padding-left:20px}
+.reg li{margin-bottom:5px;line-height:1.45}
+.reg.v{background:var(--vert-clair);color:var(--vert)}
+.reg.o{background:var(--orange-clair);color:var(--orange)}
+.reg.r{background:#fdecea;color:#b0301f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .reg.r{background:#2a1512;color:#e8705f}}
+.astuce{background:var(--fond-2);border:1px dashed var(--vert);color:var(--texte);border-radius:12px;padding:13px 15px;font-size:15px;margin-top:6px;line-height:1.5}
+.coche{display:flex;align-items:center;gap:13px;width:100%;min-height:64px;padding:14px;margin-top:18px;border:2px solid var(--bord);border-radius:14px;background:var(--fond);color:var(--texte);font:inherit;font-family:inherit;text-align:left;cursor:pointer;font-size:15.5px;font-weight:600;line-height:1.4}
+.coche[aria-pressed="true"]{border-color:var(--vert);background:var(--vert-clair)}
+.coche .case{flex:0 0 auto;width:28px;height:28px;border:2px solid var(--bord);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:17px}
+.coche[aria-pressed="true"] .case{background:var(--vert);border-color:var(--vert)}
+.rassure{background:var(--vert-clair);border:1px solid var(--vert);color:var(--texte);border-radius:14px;padding:16px;font-size:15.5px;margin:16px 0;line-height:1.5}
 .note{background:#fff8e6;border:1px solid #f0dca8;color:#6b5312;border-radius:12px;padding:12px 14px;font-size:14px;margin:16px 0}
+.attente-box{background:var(--orange-clair);border:1px solid var(--orange);color:var(--orange);border-radius:14px;padding:14px 16px;font-size:15px;margin:0 0 16px;line-height:1.5}
+.virement{background:var(--fond-2);border:2px solid var(--vert);border-radius:16px;padding:6px 16px}
+.vl{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--bord);font-size:15px}
+.vl:last-child{border-bottom:0}
+.vl span{color:var(--doux);flex:0 0 auto}
+.vl b{text-align:right;font-size:16px}
+.vl.ref b{color:var(--vert);font-size:19px;letter-spacing:.03em}
+.copiable{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.alerte{background:var(--orange-clair);border:1px solid var(--orange);color:var(--orange);border-radius:12px;padding:13px 15px;font-size:14.5px;margin-top:14px;line-height:1.5}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .note{background:#2a2412;border-color:#4d411c;color:#e6d39a}}
 </style>
 </head>
 <body>
 
-<div class="bandeau">Démonstration — parcourez le service exactement comme un client</div>
+<div class="bandeau">Abidjan ⇄ France · Prix ferme tout compris · Sans compte</div>
 
 <header><div class="wrap bar">
   <button class="logo" onclick="aller('accueil')">BABI SHIP</button>
-  <a class="mini" href="index.html" style="text-decoration:none;display:inline-block">← Menu</a>
+  <a class="mini" href="https://wa.me/33695607868" target="_blank" rel="noopener">💬 WhatsApp</a>
 </div></header>
 
-<!-- ACCUEIL -->
 <div class="vue on" id="v-accueil"><div class="wrap">
   <div class="hero">
     <h1>Envoyez un colis entre la France et Abidjan</h1>
-    <p class="chapo">Prix ferme, tout compris. Collecte à domicile. Suivi sur WhatsApp. Sans créer de compte.</p>
-    <ul class="puces"><li>Prix tout compris</li><li>Collecte incluse</li><li>Suivi WhatsApp</li><li>Sans compte</li></ul>
+    <p class="chapo">Choisissez votre vol. Choisissez comment récupérer le colis à l'arrivée. Prix ferme, payé une seule fois.</p>
+    <ul class="puces"><li>Paris &amp; Lille</li><li>Prix tout compris</li><li>Suivi WhatsApp</li><li>Sans compte</li></ul>
     <button class="btn" onclick="demarrer()">Envoyer un colis</button>
     <button class="btn btn-2" onclick="aller('suivi')">Suivre un colis</button>
   </div>
-
-  <div class="note"><strong>Démonstration.</strong> Les tarifs et délais sont des valeurs d'exemple. Aucun paiement n'est possible.</div>
+  <div class="rassure"><strong>Une question avant de commander ?</strong> Écrivez-nous sur WhatsApp, nous répondons sous 2 heures ouvrées.<br><a class="btn" style="margin-top:12px" href="https://wa.me/33695607868" target="_blank" rel="noopener">💬 Nous écrire sur WhatsApp</a></div>
 
   <section>
     <h2 class="titre">Comment ça marche</h2>
     <ol class="etapes">
-      <li><span><b>Vous obtenez votre prix</b><span>Trois questions, prix ferme tout compris. Aucun compte à créer.</span></span></li>
-      <li><span><b>Nous venons chercher le colis</b><span>Collecte à domicile incluse, ou dépôt au point BABI SHIP le plus proche. Départ sous 48 h.</span></span></li>
-      <li><span><b>Le destinataire indique où livrer</b><span>Il reçoit un lien WhatsApp et pose lui-même son repère sur la carte.</span></span></li>
-      <li><span><b>Vous suivez jusqu'à la remise</b><span>Un seul numéro de suivi, une notification WhatsApp à chaque étape.</span></span></li>
+      <li><span><b>Vous choisissez votre vol</b><span>Dates de départ et d'arrivée réelles, pas une estimation.</span></span></li>
+      <li><span><b>Nous récupérons le colis</b><span>Collecte à domicile incluse, ou dépôt au point BABI SHIP le plus proche.</span></span></li>
+      <li><span><b>Vous choisissez l'arrivée</b><span>Retrait à notre point de retrait, transporteur de votre choix, ou livraison organisée par nous.</span></span></li>
+      <li><span><b>Vous payez une seule fois</b><span>Fret et dernier kilomètre réglés ensemble. Rien à payer à l'arrivée.</span></span></li>
     </ol>
   </section>
 
   <section>
     <h2 class="titre">Pourquoi BABI SHIP</h2>
     <div class="cartes">
-      <div class="cc"><b>Le prix affiché est le prix payé</b><span>Rien à régler à la livraison. Aucune surprise pour celui qui reçoit.</span></div>
+      <div class="cc"><b>Des vols, pas des estimations</b><span>Vous savez quel avion emporte votre colis et quand il atterrit.</span></div>
+      <div class="cc"><b>Vous gardez la main</b><span>Retrait compris ou transporteur choisi par vous, prix affiché avant de payer.</span></div>
       <div class="cc"><b>Pensé pour Abidjan</b><span>Pas besoin d'adresse postale : un repère sur la carte suffit.</span></div>
-      <div class="cc"><b>Tout passe par WhatsApp</b><span>Suivi, collecte, livraison. Pas d'e-mail à surveiller.</span></div>
       <div class="cc"><b>Preuve à chaque étape</b><span>Photo horodatée à la collecte et à la remise du colis.</span></div>
     </div>
   </section>
@@ -183,282 +192,403 @@ footer{border-top:1px solid var(--bord);padding:24px 0 40px;color:var(--doux);fo
 
   <section>
     <h2 class="titre">Questions fréquentes</h2>
-    <details><summary>Combien de temps dure la livraison ?</summary><p>Le colis part sous 48 h après la commande. Comptez ensuite 5 jours ouvrés vers Abidjan et 4 jours ouvrés vers la France. La date exacte est annoncée avant le paiement.</p></details>
-    <details><summary>Y a-t-il des frais à payer à la livraison ?</summary><p>Non. Le prix affiché au moment de la commande est le prix total. Le destinataire n'a rien à régler.</p></details>
-    <details><summary>Et si le destinataire n'a pas d'adresse précise ?</summary><p>C'est prévu. Il reçoit un lien WhatsApp et pose lui-même un repère sur la carte, avec un point de repère en texte.</p></details>
-    <details><summary>Comment puis-je payer ?</summary><p>Carte bancaire depuis la France. Wave, Orange Money et MTN Money depuis la Côte d'Ivoire.</p></details>
-    <details><summary>Et si mon colis dépasse 23 kg ?</summary><p>Choisissez « Plus gros ». Nous répondons sur WhatsApp sous 2 heures ouvrées avec un prix ferme.</p></details>
+    <details><summary>Comment sont fixés les délais ?</summary><p>Vous choisissez vous-même un vol dans le calendrier. La date d'arrivée à notre centre est celle du vol, pas une moyenne.</p></details>
+    <details><summary>Combien de temps puis-je laisser le colis avant de le retirer ?</summary><p>48 heures de stockage sont offertes après l'arrivée à notre centre. Au-delà, un forfait journalier s'applique.</p></details>
+    <details><summary>Le retrait sur place est-il payant ?</summary><p>Non. Il est compris dans le prix réglé au départ. Rien à payer en venant chercher le colis.</p></details>
+    <details><summary>Puis-je choisir mon transporteur pour la livraison finale ?</summary><p>Oui. DPD, Chronopost, UPS : vous choisissez, le prix est affiché, et tout est payé en une seule fois.</p></details>
+    <details><summary>Que puis-je envoyer ?</summary><p>Vêtements, chaussures, denrées sèches, sauces sans viande ni lait, cosmétiques, appareils, artisanat. La viande, le lait, les fruits frais et l'alcool sont refusés. <a href="produits.html" style="color:var(--vert)">Voir la liste complète</a>.</p></details><details><summary>Et si le destinataire n'a pas d'adresse précise ?</summary><p>Il reçoit un lien WhatsApp et pose lui-même son repère sur la carte.</p></details>
   </section>
 </div></div>
 
-<!-- PARCOURS -->
 <div class="vue" id="v-parcours"><div class="wrap">
   <div class="pbar" id="pbar"></div>
   <button class="retour" id="btn-retour" onclick="precedent()">← Retour</button>
   <div class="etape" id="etape"></div>
 </div></div>
 
-<!-- CONFIRMATION -->
 <div class="vue" id="v-confirm"><div class="wrap"><div class="etape" id="confirm"></div></div></div>
-
-<!-- SUIVI -->
 <div class="vue" id="v-suivi"><div class="wrap"><div class="etape" id="suivi"></div></div></div>
-
-<!-- DESTINATAIRE -->
 <div class="vue" id="v-dest"><div class="wrap"><div class="etape" id="dest"></div></div></div>
 
-<footer><div class="wrap">BABI SHIP · Abidjan ⇄ France / Europe · Démonstration</div></footer>
+<footer><div class="wrap">BABI SHIP · Abidjan ⇄ France / Europe<br>WhatsApp : <a href="https://wa.me/33695607868" style="color:var(--vert)">nous écrire</a></div></footer>
 
 <script>
-/* ---------- données ---------- */
-var CONTENUS=[
- {id:"vet",i:"👕",n:"Vêtements"},{id:"cha",i:"👟",n:"Chaussures"},
- {id:"ali",i:"🥫",n:"Alimentaire"},{id:"bea",i:"🧴",n:"Beauté"},
- {id:"tel",i:"📱",n:"Téléphone, appareil"},{id:"doc",i:"📄",n:"Documents"},
- {id:"cad",i:"🎁",n:"Cadeaux, divers"}
+var CONTENUS=[{id:"vet",i:"👕",n:"Vêtements"},{id:"cha",i:"👟",n:"Chaussures"},{id:"ali",i:"🥫",n:"Alimentaire"},{id:"bea",i:"🧴",n:"Beauté"},{id:"tel",i:"📱",n:"Téléphone, appareil"},{id:"doc",i:"📄",n:"Documents"},{id:"cad",i:"🎁",n:"Cadeaux, divers"}];
+
+var MARGE=1.25;  // +25 % appliqués à tous les tarifs fournisseurs
+
+var LIAISONS=[
+ {id:"par-abj", dep:"Paris", arr:"Abidjan", pays:"fr", mode:"avion", ico:"✈️",
+  kg:5, dossier:20, mini:2, devise:"EUR", jours:[2,4,6], transit:3,
+  depot:"Point BABI SHIP Paris", note:"Départs 3 fois par semaine"},
+ {id:"lil-abj", dep:"Lille", arr:"Abidjan", pays:"fr", mode:"avion", ico:"✈️",
+  kg:15, dossier:0, mini:3, devise:"EUR", jours:[1,3,4,6], transit:2,
+  depot:"46 rue du capitaine Ferber, 59000 Lille", note:"Métro Portes de Douai · 48 h"},
+ {id:"abj-par", dep:"Abidjan", arr:"Paris", pays:"ci", mode:"avion", ico:"✈️",
+  kg:5, dossier:20, mini:2, devise:"XOF", jours:[2,4,6], transit:3,
+  depot:"Point BABI SHIP Riviera 2", note:"Départs 3 fois par semaine"},
+ {id:"abj-lil", dep:"Abidjan", arr:"Lille", pays:"ci", mode:"avion", ico:"✈️",
+  kg:9.91, dossier:0, mini:3, devise:"XOF", jours:[1,3,6], transit:2,
+  depot:"Riviera 2, près de la cité universitaire", note:"6 500 FCFA/kg · 48 h"},
+ {id:"abj-lil-bat", dep:"Abidjan", arr:"Lille", pays:"ci", mode:"bateau", ico:"🚢",
+  kg:1, dossier:0, mini:10, devise:"XOF", jours:[2], transit:35,
+  depot:"Riviera 2, près de la cité universitaire", note:"Économique · idéal gros volumes"}
 ];
+
+var PLANCHER=8;  // frais de service minimum, en euros
+
+function liaison(){ return trouve(LIAISONS, E.liaison); }
+function prixFret(kg){
+  var L=liaison(); if(!L) return 0;
+  var p=Math.max(kg, L.mini)*L.kg + L.dossier;
+  var marge=Math.max(p*(MARGE-1), PLANCHER);
+  return Math.round((p+marge)*100)/100;
+}
+
 var TAILLES=[
- {id:"env",i:"✉️",n:"Une enveloppe",d:"Papiers, photos",kg:0.5,cm:[32,23,2]},
- {id:"ch", i:"👟",n:"Une paire de chaussures",d:"Jusqu'à 2 kg",kg:1.5,cm:[35,25,13]},
- {id:"ct", i:"📦",n:"Un carton à chaussures",d:"Plusieurs paires, jusqu'à 7 kg",kg:6,cm:[40,35,30]},
- {id:"vc", i:"🧳",n:"Une valise cabine",d:"Jusqu'à 10 kg",kg:10,cm:[55,40,20]},
- {id:"gv", i:"🧳",n:"Une grande valise",d:"Jusqu'à 23 kg",kg:23,cm:[75,50,30]},
- {id:"pg", i:"🚚",n:"Plus gros",d:"On vous fait un devis",p:null}
-];
-var POINTS_FR=[
- {n:"BABI SHIP Château-Rouge",q:"Paris 18e · 1,2 km"},
- {n:"BABI SHIP Saint-Denis Basilique",q:"Saint-Denis · 3,4 km"},
- {n:"BABI SHIP Croix-de-Chavaux",q:"Montreuil · 5,1 km"}
-];
-var POINTS_CI=[
- {n:"BABI SHIP Riviera 2",q:"Cocody · 1,5 km"},
- {n:"BABI SHIP Zone 4",q:"Marcory · 4,2 km"},
- {n:"BABI SHIP Liberté",q:"Adjamé · 6,8 km"}
-];
-/* Tarifs et délais : mêmes valeurs que l'application (lib/tarifs.ts du dépôt babiship), provisoires « À CONFIRMER ».
-   Montants dans la devise du départ : euros depuis la France, FCFA depuis Abidjan. */
-var GRILLE={diviseur:6000,pasKg:0.5,minKg:0.5,
- fr:{fixe:9,parKg:8,arrondi:1,delai:7},     /* France → Abidjan : 2 jours ouvrés avant départ + 5 d'acheminement */
- ci:{fixe:6000,parKg:5500,arrondi:100,delai:6} /* Abidjan → France : 2 jours ouvrés avant départ + 4 d'acheminement */
+ {id:"env",i:"✉️",n:"Une enveloppe",d:"Papiers, photos · jusqu'à 0,5 kg",p:16},
+ {id:"ch", i:"👟",n:"Une paire de chaussures",d:"Jusqu'à 2 kg",p:28},
+ {id:"ct", i:"📦",n:"Un carton à chaussures",d:"Plusieurs paires, jusqu'à 7 kg",p:68},
+ {id:"vc", i:"🧳",n:"Une valise cabine",d:"Jusqu'à 10 kg",p:92},
+ {id:"gv", i:"🧳",n:"Une grande valise",d:"Jusqu'à 23 kg",p:196},
+ {id:"pg", i:"🚚",n:"Plus gros",d:"On vous fait un devis",p:null}];
+var POINTS=[{n:"Point BABI SHIP Riviera 2",q:"Cocody"},{n:"Point BABI SHIP Zone 4",q:"Marcory"},{n:"Point BABI SHIP Liberté",q:"Adjamé"}];
+var SORTIE_FR=[
+ {id:"ret",i:"🏢",n:"Retrait à notre point Paris",d:"Adresse communiquée après paiement · du lundi au samedi",p:0,note:"Compris dans votre prix · 48 h de stockage offertes, puis 3 €/jour"},
+ {id:"dpd",i:"🚚",n:"DPD",d:"À domicile sous 24 à 48 h",p:10},
+ {id:"chr",i:"🚚",n:"Chronopost",d:"À domicile avant 13 h le lendemain",p:12},
+ {id:"ups",i:"🚚",n:"UPS",d:"À domicile sous 24 h, suivi détaillé",p:15},
+ {id:"bs", i:"🛵",n:"Livraison organisée par BABI SHIP",d:"Nous nous occupons de tout, créneau convenu par WhatsApp",p:22}];
+var SORTIE_CI=[
+ {id:"ret",i:"🏢",n:"Retrait à un point BABI SHIP",d:"Point communiqué après paiement · 7 j/7",p:0,note:"Compris dans votre prix · 48 h de stockage offertes, puis 2 000 FCFA/jour"},
+ {id:"dom",i:"🛵",n:"Livraison à domicile par notre livreur",d:"Abidjan et communes · créneau convenu par WhatsApp",p:8},
+ {id:"exp",i:"⚡",n:"Livraison express le jour même",d:"Commandée avant 12 h · Abidjan uniquement",p:16}];
+var STATUTS=["Paiement confirmé","Colis enregistré","Colis pris en charge","Au centre de départ","En vol","Arrivé au centre de distribution","En cours de livraison","Livré"];
+var ICO=["💰","📝","📦","🏢","✈️","🛬","🛵","✅"];
+
+
+var REGLES={
+ vet:{ok:["Vêtements, pagnes, textile","Chaussures, sacs, accessoires","Linge de maison, tissus"],
+      no:["Peaux, fourrures et cuirs d'espèces protégées"]},
+ cha:{ok:["Chaussures neuves ou portées","Sacs, ceintures, accessoires"],
+      no:["Articles en peau d'espèce protégée (python, crocodile sauvage)"]},
+ ali:{ok:["Denrées sèches : arachide, gingembre, épices, attiéké sec, farines, café, cacao, thé","Sauces et condiments sans viande ni lait : sauce graine végétale, piment, soumbala","Huiles végétales : karité, palme, coco","Fruits secs et graines transformées"],
+      cond:["Poisson et produits de la pêche : quantité limitée","Miel : quantité limitée"],
+      no:["Viande, poulet, charcuterie, viande de brousse — même séchée, fumée ou sous vide","Lait, fromage, yaourt, beurre","Fruits et légumes frais","Alcool sous toutes ses formes"],
+      alt:"Votre sauce contient de la viande ? Envoyez la version végétale, elle passe sans problème."},
+ bea:{ok:["Crèmes, savons, beurre de karité","Mèches, perruques, produits capillaires","Maquillage"],
+      cond:["Parfums : quantité limitée","Aérosols et vaporisateurs sous pression : interdits en soute"]},
+ tel:{ok:["Téléphones, tablettes, ordinateurs (batterie à l'intérieur de l'appareil)","Écouteurs, chargeurs, câbles"],
+      no:["Batteries lithium seules, hors appareil","Batteries externes non déclarées"]},
+ doc:{ok:["Documents, contrats, diplômes","Livres, photos, courrier"],
+      no:["Papiers d'identité originaux (passeport, CNI)","Espèces, chèques au porteur"]},
+ cad:{ok:["Artisanat, décoration, jouets","Objets neufs sous emballage","Bijoux fantaisie"],
+      cond:["Objets d'art anciens : une autorisation d'exportation peut être exigée","Bijoux de valeur : à déclarer et assurer"],
+      no:["Ivoire, écailles, peaux d'espèces protégées","Armes, munitions et répliques"]}
 };
-function statuts(depFr){return ["Colis enregistré","Colis pris en charge","Au centre de départ, "+(depFr?"France":"Abidjan"),"En vol","Arrivé "+(depFr?"à Abidjan":"en France"),"En cours de livraison","Livré"];}
-var ICO=["📝","📦","🏢","✈️","🛬","🛵","✅"];
+var INTERDIT_TOUJOURS=["Stupéfiants","Armes et munitions","Produits inflammables, gaz, briquets","Espèces et objets de grande valeur non déclarés"];
+var E={},pas=1,TOTAL=11,VOLS=[];
+function reset(){E={sens:null,liaison:null,poids:5,contenu:null,declare:false,taille:null,vol:null,remise:null,pin:null,pinXY:null,repere:"",point:null,sortie:null,moyen:null,paye:false,tel:"",fret:0,dernier:0,total:0,num:null};}
+reset();
 
-var E={sens:null,contenu:null,taille:null,remise:null,adresse:null,complement:"",pin:null,repere:"",point:null,tel:"",prix:null,date:null,num:null};
-var pas=1, TOTAL=8;
-
-/* ---------- utilitaires ---------- */
-function joursOuvres(n){var d=new Date(),a=0;while(a<n){d.setDate(d.getDate()+1);var j=d.getDay();if(j!==0&&j!==6)a++;}return d;}
-function dateTexte(d){var J=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"],M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];return J[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];}
+function dTxt(d){var J=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."],M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];return J[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];}
 function esp(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ");}
-function versCI(){return E.sens==="fr";}
-function fmtPrix(m){return versCI()? m+" €" : esp(m)+" FCFA";}
-function auDessus(v,pas){return Number((Math.ceil(Number((v/pas).toFixed(9)))*pas).toFixed(9));}
-function grille(){return versCI()?GRILLE.fr:GRILLE.ci;}
-function prixPour(t){
-  var vol=t.cm[0]*t.cm[1]*t.cm[2]/GRILLE.diviseur;
-  var kg=Math.max(auDessus(Math.max(t.kg,vol),GRILLE.pasKg),GRILLE.minKg);
-  var g=grille(); return auDessus(g.fixe+g.parKg*kg,g.arrondi);
-}
-function indicatif(){return versCI()?"+33":"+225";}
+function versCI(){var L=liaison();return L?L.pays==="fr":E.sens==="fr";}
+function fmt(eur){return versCI()? (Math.round(eur*100)/100)+" €" : esp(Math.round(eur*655.957/100)*100)+" FCFA";}
 function trouve(t,id){for(var i=0;i<t.length;i++)if(t[i].id===id)return t[i];return null;}
-function aller(v){
-  var l=document.querySelectorAll(".vue");
-  for(var i=0;i<l.length;i++)l[i].classList.remove("on");
-  document.getElementById("v-"+v).classList.add("on");
-  window.scrollTo(0,0);
-  if(v==="suivi")rendreSuivi();
-  if(v==="dest")rendreDest();
-}
-function demarrer(){E={sens:null,contenu:null,taille:null,remise:null,adresse:null,complement:"",pin:null,repere:"",point:null,tel:"",prix:null,date:null,num:null};pas=1;aller("parcours");rendre();}
+function sorties(){return versCI()?SORTIE_CI:SORTIE_FR;}
+function ville(){var L=liaison();return L?L.arr:"Abidjan";}
+function villeDep(){var L=liaison();return L?L.dep:"Paris";}
 
-/* ---------- parcours ---------- */
+function vols(){
+  var L=liaison(); if(!L) return [];
+  var out=[],d=new Date(),n=0;
+  while(out.length<5&&n<120){
+    d.setDate(d.getDate()+1);n++;
+    if(L.jours.indexOf(d.getDay())>=0){
+      var arr=new Date(d);arr.setDate(arr.getDate()+L.transit);
+      out.push({id:out.length,dep:new Date(d),arr:arr,places:[6,11,14,20,25][out.length]});
+    }
+  }
+  return out;
+}
+
+
+function prixFretL(L,kg){
+  var p=Math.max(kg,L.mini)*L.kg + L.dossier;
+  return Math.round((p+Math.max(p*(MARGE-1),PLANCHER))*100)/100;
+}
+function choisirLiaison(id){
+  E.liaison=id;
+  var L=liaison();
+  E.sens = L.pays==="fr" ? "fr" : "ci";
+  E.poids = Math.max(E.poids||L.mini, L.mini);
+  VOLS=vols();
+  rendre();
+}
+function majPoids(v){
+  v=Math.max(1,Math.min(30,Math.round(Number(v))));
+  E.poids=v;
+  var a=document.getElementById("pval"), b=document.getElementById("pprix"), c=document.querySelector(".slider");
+  if(a)a.textContent=v;
+  if(b)b.textContent=fmt(prixFret(v));
+  if(c)c.value=v;
+}
+function aller(v){var l=document.querySelectorAll(".vue");for(var i=0;i<l.length;i++)l[i].classList.remove("on");document.getElementById("v-"+v).classList.add("on");window.scrollTo(0,0);if(v==="suivi")rendreSuivi();if(v==="dest")rendreDest();}
+function demarrer(){reset();VOLS=vols();pas=1;aller("parcours");rendre();}
 function rendre(){
   var b=document.getElementById("pbar");b.innerHTML="";
   for(var i=1;i<=TOTAL;i++){var s=document.createElement("i");if(i<=pas)s.className="f";b.appendChild(s);}
-  document.getElementById("btn-retour").style.visibility = pas>1 ? "visible":"hidden";
-  var z=document.getElementById("etape");
-  z.innerHTML = ecran(pas);
+  document.getElementById("btn-retour").style.visibility=pas>1?"visible":"hidden";
+  document.getElementById("etape").innerHTML=ecran(pas);
   window.scrollTo(0,0);
-  if(pas===6 && E.remise==="collecte" && !versCI()) brancherCarteNon();
-  if(pas===6 && E.remise==="collecte" && versCI()) brancherCarte();
 }
-function suivant(){ if(pas<TOTAL){pas++;rendre();} }
-function precedent(){ if(pas>1){pas--;rendre();} }
+function suivant(){if(pas<TOTAL){pas++;rendre();}}
+function precedent(){if(pas>1){pas--;rendre();}}
+function choisir(c,v){E[c]=v;rendre();}
+function cont(a){return '<button class="btn" onclick="suivant()" '+(a!==null&&a!==undefined?"":"disabled")+'>Continuer</button>';}
+function opt(c,v,i,t){return '<button class="opt" type="button" aria-pressed="'+(E[c]===v)+'" onclick="choisir(\''+c+'\',\''+v+'\')"><span class="gros">'+i+'</span><span>'+t+'</span></button>';}
+function lig(c,v,i,n,d,tarif){return '<button class="ligne" type="button" aria-pressed="'+(E[c]===v)+'" onclick="choisir(\''+c+'\',\''+v+'\')"><span class="ico">'+i+'</span><span style="flex:1"><span class="nom">'+n+'</span>'+(d?'<span class="det">'+d+'</span>':'')+'</span>'+(tarif?'<span class="tarif">'+tarif+'</span>':'')+'</button>';}
 
-function ecran(n){
-  if(n===1){
-    return '<h2>Vous envoyez un colis…</h2><div class="grille2">'+
-      opt("sens","fr","🇫🇷 → 🇨🇮","France → Abidjan")+
-      opt("sens","ci","🇨🇮 → 🇫🇷","Abidjan → France")+
-      '</div>'+cont(E.sens);
-  }
-  if(n===2){
-    var h='<h2>Qu\'y a-t-il dans le colis ?</h2><div class="grille3">';
-    CONTENUS.forEach(function(c){h+=opt("contenu",c.id,c.i,c.n);});
-    return h+'</div>'+cont(E.contenu);
-  }
-  if(n===3){
-    var h='<h2>C\'est gros comme…</h2>';
-    TAILLES.forEach(function(t){h+=lig("taille",t.id,t.i,t.n,t.d);});
-    return h+cont(E.taille);
-  }
-  if(n===4){
-    var t=trouve(TAILLES,E.taille);
-    if(t && t.id==="pg"){
-      return '<h2>Demande de devis</h2>'+
-        '<label class="lab">Votre nom</label><input placeholder="Ex. : Awa K.">'+
-        '<label class="lab">Votre WhatsApp</label><div class="tel"><span class="ind">'+indicatif()+'</span><input placeholder="07 00 00 00 00"></div>'+
-        '<label class="lab">Que voulez-vous envoyer ?</label><textarea placeholder="Ex. : 3 gros cartons de vêtements"></textarea>'+
-        '<button class="btn" onclick="aller(\'accueil\')">Envoyer ma demande</button>'+
-        '<p class="aide" style="text-align:center">Nous vous répondons sur WhatsApp sous 2 heures ouvrées.</p>';
-    }
-    E.prix=prixPour(t); E.date=dateTexte(joursOuvres(grille().delai));
-    var c=trouve(CONTENUS,E.contenu);
-    return '<h2>Votre prix</h2>'+
-      '<div class="prix-boite"><span class="prix">'+fmtPrix(E.prix)+'</span><p class="prix-note">Tout compris · collecte incluse</p></div>'+
-      '<div class="info">Livré '+(versCI()?"à Abidjan":"en France")+' le <strong>'+E.date+'</strong></div>'+
-      '<div class="recap">'+
-        '<div><span>Trajet</span><b>'+(versCI()?"France → Abidjan":"Abidjan → France")+'</b></div>'+
-        '<div><span>Contenu</span><b>'+c.i+' '+c.n+'</b></div>'+
-        '<div><span>Taille</span><b>'+t.n+'</b></div>'+
-        '<div><span>Départ</span><b>sous 48 h</b></div>'+
-      '</div>'+
-      '<button class="btn" onclick="suivant()">J\'envoie mon colis</button>';
-  }
-  if(n===5){
-    return '<h2>Comment nous remettez-vous le colis ?</h2>'+
-      lig("remise","collecte","🏠","On vient chez vous","Collecte à domicile, incluse")+
-      lig("remise","depot","📍","Je dépose le colis","Au point BABI SHIP le plus proche")+
-      cont(E.remise);
-  }
-  if(n===6){
-    if(E.remise==="depot"){
-      var h='<h2>Où déposez-vous le colis ?</h2>';
-      (versCI()?POINTS_FR:POINTS_CI).forEach(function(p,i){h+=lig("point",String(i),"📍",p.n,p.q);});
-      return h+cont(E.point);
-    }
-    if(versCI()){
-      return '<h2>Votre adresse</h2>'+
-        '<button class="ligne" aria-pressed="true"><span class="ico">🏠</span><span><span class="nom">12 rue Doudeauville</span><span class="det">75018 Paris</span></span></button>'+
-        '<label class="lab">Complément <span style="font-weight:400;color:var(--doux)">(facultatif)</span></label>'+
-        '<input placeholder="Étage, digicode, bâtiment">'+
-        '<button class="btn" onclick="suivant()">Continuer</button>';
-    }
-    return '<h2>Où venons-nous chercher le colis ?</h2>'+
-      '<p class="aide" style="margin:0 0 12px">Touchez la carte pour poser le pin.</p>'+
-      carteSVG()+
-      '<p class="pin-info" id="pin-info">'+(E.pin?"📍 Pin posé · "+E.pin:"Aucun pin posé")+'</p>'+
-      '<label class="lab">Un repère</label><input id="rep" value="'+E.repere+'" placeholder="Ex. : portail bleu en face de la pharmacie">'+
-      '<button class="btn" id="btn-pin" onclick="validerPin()" '+(E.pin?"":"disabled")+'>Continuer</button>';
-  }
-  if(n===7){
-    return '<h2>Le WhatsApp de la personne qui reçoit</h2>'+
-      '<div class="tel"><span class="ind">'+(versCI()?"+225":"+33")+'</span><input id="tel" value="'+E.tel+'" placeholder="07 00 00 00 00" oninput="majTel(this.value)"></div>'+
-      '<p class="aide">📍 Il recevra un lien pour indiquer lui-même où livrer.</p>'+
-      '<button class="btn" id="btn-tel" onclick="suivant()" '+(E.tel.length>=6?"":"disabled")+'>Continuer</button>';
-  }
-  if(n===8){
-    var moyens = versCI()
-      ? [["💳","Carte bancaire"],["🌊","Wave"],["🟠","Orange Money"],["🟡","MTN Money"]]
-      : [["🌊","Wave"],["🟠","Orange Money"],["🟡","MTN Money"],["💳","Carte bancaire"]];
-    var h='<h2>Paiement</h2><div class="note">Démonstration : aucun argent n\'est prélevé.</div>';
-    moyens.forEach(function(m){h+='<button class="ligne" onclick="payer(this)"><span class="ico">'+m[0]+'</span><span><span class="nom">'+m[1]+'</span></span></button>';});
-    return h+'<button class="btn" onclick="terminer()">Payer '+fmtPrix(E.prix)+'</button>';
-  }
-  return "";
-}
-function opt(champ,val,ico,txt){
-  var on = E[champ]===val;
-  return '<button class="opt" type="button" aria-pressed="'+on+'" onclick="choisir(\''+champ+'\',\''+val+'\')"><span class="gros">'+ico+'</span><span>'+txt+'</span></button>';
-}
-function lig(champ,val,ico,nom,det){
-  var on = E[champ]===val;
-  return '<button class="ligne" type="button" aria-pressed="'+on+'" onclick="choisir(\''+champ+'\',\''+val+'\')"><span class="ico">'+ico+'</span><span><span class="nom">'+nom+'</span>'+(det?'<span class="det">'+det+'</span>':'')+'</span></button>';
-}
-function cont(actif){
-  return '<button class="btn" onclick="suivant()" '+(actif!==null&&actif!==undefined?"":"disabled")+'>Continuer</button>';
-}
-function choisir(champ,val){E[champ]=val;rendre();}
-function majTel(v){E.tel=v.replace(/\s/g,"");document.getElementById("btn-tel").disabled = E.tel.length<6;}
-function payer(el){
-  var l=el.parentNode.querySelectorAll(".ligne");
-  for(var i=0;i<l.length;i++)l[i].setAttribute("aria-pressed","false");
-  el.setAttribute("aria-pressed","true");
-}
-
-/* carte simplifiée d'Abidjan */
 function carteSVG(){
-  return '<svg class="carte-svg" id="carte" viewBox="0 0 360 200" onclick="poserPin(event)">'+
-  '<rect width="360" height="200" fill="#e3ece5"/>'+
-  '<path d="M0 118 H360 V150 H0 Z" fill="#bcd6e8"/>'+
-  '<path d="M120 118 L150 150 L190 118 Z" fill="#bcd6e8"/>'+
+  return '<svg class="map" id="carte" viewBox="0 0 360 200" onclick="poserPin(event)">'+
+  '<rect width="360" height="200" fill="#e3ece5"/><path d="M0 118 H360 V150 H0 Z" fill="#bcd6e8"/><path d="M120 118 L150 150 L190 118 Z" fill="#bcd6e8"/>'+
   '<path d="M40 40 H320 M180 20 V180 M90 60 L280 140" stroke="#fff" stroke-width="5"/>'+
-  '<g font-size="11" font-weight="700" fill="#4a5a52" font-family="sans-serif">'+
-  '<text x="150" y="30">Abobo</text><text x="105" y="62">Adjamé</text><text x="255" y="62">Cocody</text>'+
-  '<text x="20" y="80">Yopougon</text><text x="145" y="92">Plateau</text>'+
-  '<text x="95" y="172">Treichville</text><text x="215" y="168">Marcory</text><text x="285" y="190">Koumassi</text>'+
-  '</g>'+
-  (E.pinXY?'<g><circle cx="'+E.pinXY[0]+'" cy="'+E.pinXY[1]+'" r="7" fill="#e8622c"/><circle cx="'+E.pinXY[0]+'" cy="'+E.pinXY[1]+'" r="2.5" fill="#fff"/></g>':'')+
-  '</svg>';
+  '<g font-size="10.5" font-weight="700" fill="#4a5a52" font-family="sans-serif"><text x="150" y="30">Abobo</text><text x="105" y="62">Adjamé</text><text x="252" y="30">Cocody</text><text x="16" y="66">Yopougon</text><text x="145" y="92">Plateau</text><text x="92" y="180">Treichville</text><text x="214" y="176">Marcory</text></g>'+
+  (E.pinXY?'<circle cx="'+E.pinXY[0]+'" cy="'+E.pinXY[1]+'" r="8" fill="#e8622c"/><circle cx="'+E.pinXY[0]+'" cy="'+E.pinXY[1]+'" r="3" fill="#fff"/>':'')+'</svg>';
 }
-function brancherCarte(){}
-function brancherCarteNon(){}
 function poserPin(ev){
-  var svg=document.getElementById("carte");
-  var r=svg.getBoundingClientRect();
-  var x=(ev.clientX-r.left)/r.width*360, y=(ev.clientY-r.top)/r.height*200;
+  var svg=document.getElementById("carte"),r=svg.getBoundingClientRect();
+  var x=(ev.clientX-r.left)/r.width*360,y=(ev.clientY-r.top)/r.height*200;
   E.pinXY=[x,y];
-  E.pin = x<110 ? "Yopougon" : (x>215 ? "Cocody" : (y>120 ? "Marcory" : "Plateau"));
+  E.pin = x<110?"Yopougon":(x>215?"Cocody":(y>120?"Marcory":"Plateau"));
   rendre();
 }
 function validerPin(){var r=document.getElementById("rep");if(r)E.repere=r.value;suivant();}
+function majTel(v){E.tel=v.replace(/\s/g,"");document.getElementById("btn-tel").disabled=E.tel.length<6;}
+function payer(el){var l=el.parentNode.querySelectorAll(".ligne");for(var i=0;i<l.length;i++)l[i].setAttribute("aria-pressed","false");el.setAttribute("aria-pressed","true");}
 
-/* ---------- confirmation ---------- */
-function terminer(){
+function ecran(n){
+  if(n===1){
+    var h='<h2>Quelle liaison ?</h2><p class="aide" style="margin:0 0 14px">Choisissez votre ville de départ.</p>';
+    LIAISONS.forEach(function(L){
+      var ex = L.devise==="EUR" ? Math.round(prixFretL(L,5))+" €" : esp(Math.round(prixFretL(L,5)*655.957/100)*100)+" F";
+      h+='<button class="ligne" type="button" aria-pressed="'+(E.liaison===L.id)+'" onclick="choisirLiaison(\''+L.id+'\')">'+
+         '<span class="ico">'+L.ico+'</span>'+
+         '<span style="flex:1"><span class="nom">'+L.dep+' → '+L.arr+'</span><span class="det">'+L.note+'</span></span>'+
+         '<span class="tarif">'+ex+'<small>5 kg</small></span></button>';
+    });
+    return h+cont(E.liaison);
+  }
+
+  if(n===2){var h='<h2>Qu\'y a-t-il dans le colis ?</h2><div class="grille2">';CONTENUS.forEach(function(c){h+=opt("contenu",c.id,c.i,c.n);});return h+'</div>'+cont(E.contenu);}
+
+  if(n===3){
+    var c=trouve(CONTENUS,E.contenu), r=REGLES[E.contenu]||{};
+    var h='<h2>'+c.i+' '+c.n+' : ce qui passe</h2>';
+    if(r.ok&&r.ok.length){
+      h+='<div class="reg v"><b>✅ Accepté</b><ul>';
+      r.ok.forEach(function(x){h+='<li>'+x+'</li>';});
+      h+='</ul></div>';
+    }
+    if(r.cond&&r.cond.length){
+      h+='<div class="reg o"><b>⚠️ Sous condition</b><ul>';
+      r.cond.forEach(function(x){h+='<li>'+x+'</li>';});
+      h+='</ul></div>';
+    }
+    if(r.no&&r.no.length){
+      h+='<div class="reg r"><b>❌ Refusé</b><ul>';
+      r.no.forEach(function(x){h+='<li>'+x+'</li>';});
+      h+='</ul></div>';
+    }
+    if(r.alt) h+='<div class="astuce">💡 '+r.alt+'</div>';
+    h+='<details style="margin-top:14px"><summary>Interdit dans tous les colis</summary><p>'+INTERDIT_TOUJOURS.join(" · ")+'</p></details>';
+    h+='<button class="coche" type="button" aria-pressed="'+E.declare+'" onclick="choisir(\'declare\','+(!E.declare)+')">'+
+       '<span class="case">'+(E.declare?"✓":"")+'</span>'+
+       '<span>Je certifie que mon colis ne contient aucun produit refusé.</span></button>';
+    h+='<p class="aide">Cette déclaration est enregistrée avec votre numéro de suivi. Un colis non conforme est retiré du vol et n\'est pas remboursé.</p>';
+    return h+'<button class="btn" onclick="suivant()" '+(E.declare?"":"disabled")+'>Continuer</button>';
+  }
+
+  if(n===4){
+    var L=liaison();
+    var h='<h2>Combien pèse votre colis ?</h2>'+
+      '<p class="aide" style="margin:0 0 14px">Minimum facturé sur cette liaison : '+L.mini+' kg.</p>'+
+      '<div class="poids-box"><button class="pm" onclick="majPoids('+(E.poids-1)+')">−</button>'+
+      '<span class="pv"><b id="pval">'+E.poids+'</b> kg</span>'+
+      '<button class="pm" onclick="majPoids('+(E.poids+1)+')">+</button></div>'+
+      '<input type="range" min="1" max="30" value="'+E.poids+'" oninput="majPoids(this.value)" class="slider">'+
+      '<div class="reperes">';
+    [[1,"✉️","Enveloppe"],[2,"👟","Une paire"],[7,"📦","Un carton"],[10,"🧳","Valise cabine"],[23,"🧳","Grande valise"]].forEach(function(r){
+      h+='<button class="rep" onclick="majPoids('+r[0]+')"><span>'+r[1]+'</span><small>'+r[2]+'<br>'+r[0]+' kg</small></button>';
+    });
+    h+='</div>'+
+      '<div class="prix-boite" style="margin-top:18px"><span class="prix" id="pprix">'+fmt(prixFret(E.poids))+'</span><p class="prix-note">Transport tout compris</p></div>'+
+      '<p class="aide">Au-delà de 30 kg, demandez un devis sur WhatsApp.</p>';
+    return h+'<button class="btn" onclick="suivant()">Continuer</button>';
+  }
+
+  if(n===5){
+    E.fret=prixFret(E.poids);
+    var h='<h2>Choisissez votre vol</h2><p class="aide" style="margin:0 0 14px">Départ '+villeDep()+' → arrivée à notre centre de '+ville()+'.</p>';
+    VOLS.forEach(function(v){h+=lig("vol",String(v.id),"✈️","Départ "+dTxt(v.dep),"Arrivée le "+dTxt(v.arr),v.places+"<small>places</small>");});
+    return h+cont(E.vol);
+  }
+
+  if(n===6) return '<h2>Comment nous remettez-vous le colis ?</h2>'+
+    lig("remise","collecte","🏠","On vient chez vous","Collecte à domicile, incluse")+
+    lig("remise","depot","📍","Je dépose le colis","Au point BABI SHIP le plus proche")+cont(E.remise);
+
+  if(n===7){
+    if(E.remise==="depot"){var h='<h2>Où déposez-vous le colis ?</h2>';POINTS.forEach(function(p,i){h+=lig("point",String(i),"📍",p.n,p.q);});return h+cont(E.point);}
+    if(versCI()) return '<h2>Votre adresse</h2>'+
+      '<button class="ligne" aria-pressed="true"><span class="ico">🏠</span><span><span class="nom">12 rue Doudeauville</span><span class="det">75018 Paris</span></span></button>'+
+      '<label class="lab">Complément <span style="font-weight:400;color:var(--doux)">(facultatif)</span></label><input placeholder="Étage, digicode, bâtiment">'+
+      '<button class="btn" onclick="suivant()">Continuer</button>';
+    return '<h2>Où venons-nous chercher le colis ?</h2><p class="aide" style="margin:0 0 12px">Touchez la carte pour poser le pin.</p>'+carteSVG()+
+      '<p class="pin-info">'+(E.pin?"📍 Pin posé · "+E.pin:"Aucun pin posé")+'</p>'+
+      '<label class="lab">Un repère</label><input id="rep" value="'+E.repere+'" placeholder="Ex. : portail bleu en face de la pharmacie">'+
+      '<button class="btn" onclick="validerPin()" '+(E.pin?"":"disabled")+'>Continuer</button>';
+  }
+
+  if(n===8){
+    var v=VOLS[Number(E.vol)];
+    var h='<h2>À l\'arrivée à '+ville()+', que fait-on ?</h2>'+
+      '<div class="info">Colis à notre centre de '+ville()+' le <strong>'+dTxt(v.arr)+'</strong></div><div style="height:14px"></div>';
+    sorties().forEach(function(s){h+=lig("sortie",s.id,s.i,s.n,(s.note?s.note:s.d),s.p===0?"Inclus":"+ "+fmt(s.p));});
+    return h+cont(E.sortie);
+  }
+
+  if(n===9) return '<h2>Le WhatsApp de la personne qui reçoit</h2>'+
+    '<div class="tel"><span class="ind">'+(versCI()?"+225":"+33")+'</span><input id="tel" value="'+E.tel+'" placeholder="07 00 00 00 00" oninput="majTel(this.value)"></div>'+
+    '<p class="aide">📍 Elle recevra un lien pour indiquer elle-même où livrer.</p>'+
+    '<button class="btn" id="btn-tel" onclick="suivant()" '+(E.tel.length>=6?"":"disabled")+'>Continuer</button>';
+
+  if(n===10){
+    var L=liaison(),c=trouve(CONTENUS,E.contenu),s=trouve(sorties(),E.sortie),v=VOLS[Number(E.vol)];
+    E.dernier=s.p;E.total=E.fret+s.p;
+    return '<h2>Votre prix</h2>'+
+      '<div class="prix-boite"><span class="prix">'+fmt(E.total)+'</span><p class="prix-note">Tout compris · payé une seule fois</p></div>'+
+      '<div class="info">Arrivée à '+ville()+' le <strong>'+dTxt(v.arr)+'</strong></div>'+
+      '<div class="recap">'+
+        '<div><span>Liaison</span><b>'+L.dep+' → '+L.arr+' '+L.ico+'</b></div>'+
+        '<div><span>Contenu</span><b>'+c.i+' '+c.n+' ✓</b></div>'+
+        '<div><span>Vol</span><b>Départ '+dTxt(v.dep)+'</b></div>'+
+        '<div><span>Transport · '+E.poids+' kg</span><b>'+fmt(E.fret)+'</b></div>'+
+        '<div><span>'+s.n+'</span><b>'+(s.p===0?"Inclus":fmt(s.p))+'</b></div>'+
+        '<div class="tot"><span>Total</span><b>'+fmt(E.total)+'</b></div>'+
+      '</div>'+
+      '<p class="aide">48 h de stockage offertes à l\'arrivée. Rien à payer à la livraison.</p>'+
+      '<button class="btn" onclick="suivant()">Passer au paiement</button>';
+  }
+
+  if(n===11){
+    var m=versCI()
+      ?[["carte","💳","Carte bancaire","Lien de paiement envoyé sur WhatsApp"],
+        ["wave","🌊","Wave","Virement vers notre numéro Wave"],
+        ["om","🟠","Orange Money","Virement vers notre numéro Orange Money"]]
+      :[["wave","🌊","Wave","Virement vers notre numéro Wave"],
+        ["om","🟠","Orange Money","Virement vers notre numéro Orange Money"],
+        ["carte","💳","Carte bancaire","Lien de paiement envoyé sur WhatsApp"]];
+    var h='<h2>Paiement</h2>';
+    m.forEach(function(x){h+=lig("moyen",x[0],x[1],x[2],x[3]);});
+    if(E.moyen==="carte") h+='<div class="attente-box">💳 Le paiement par carte arrive très bientôt.<br>En attendant, finalisez votre commande sur WhatsApp : nous vous envoyons un lien de paiement sécurisé.</div>'+
+      '<a class="btn" href="https://wa.me/33695607868?text="+encodeURIComponent("Bonjour, je souhaite envoyer un colis "+(versCI()?"France vers Abidjan":"Abidjan vers la France")+". Montant : "+fmt(E.total)+". Je voudrais payer par carte.")+"" target="_blank" rel="noopener">💬 Finaliser sur WhatsApp</a>';
+    else if(E.moyen) h+='<button class="btn" onclick="terminer(\''+E.moyen+'\')">Continuer · '+fmt(E.total)+'</button>';
+    else h+='<button class="btn" disabled>Choisissez un moyen de paiement</button>';
+    return h;
+  }
+  return "";
+}
+
+var COMPTES={wave:{n:"Wave",i:"🌊",num:"+225 07 08 73 38 28",titulaire:"YOBOUÉ (BABI SHIP)"},
+             om:{n:"Orange Money",i:"🟠",num:"+225 07 08 73 38 28",titulaire:"YOBOUÉ (BABI SHIP)"}};
+
+function adresseRetrait(){
+  return versCI()
+    ? "Point BABI SHIP Riviera 2, Cocody<br>Ouvert 7 j/7, 9 h – 19 h<br>Présentez votre numéro de suivi.<br><small>48 h de stockage offertes, puis 2 000 FCFA/jour.</small>"
+    : "18 rue de la Chapelle, 93200 Saint-Denis<br>Du lundi au samedi, 10 h – 18 h<br>Présentez votre numéro de suivi.<br><small>48 h de stockage offertes, puis 3 €/jour.</small>";
+}
+function terminer(moyen){
+  var v=VOLS[Number(E.vol)],s=trouve(sorties(),E.sortie);
   E.num="BS-"+Math.floor(100000+Math.random()*899999);
-  document.getElementById("confirm").innerHTML=
-    '<h2 style="text-align:center">C\'est parti !</h2>'+
-    '<div class="bandeau-vert" style="text-align:center"><small>Votre numéro de suivi</small><span class="num">'+E.num+'</span><small>'+(versCI()?"France → Abidjan":"Abidjan → France")+' · livré le '+E.date+'</small></div>'+
-    '<div class="bloc">💬 Le destinataire reçoit un lien WhatsApp au '+(versCI()?"+225":"+33")+' '+E.tel+'.</div>'+
-    '<div class="bloc">🏠 Nous vous contactons sur WhatsApp pour la collecte. Départ sous 48 h.</div>'+
-    '<button class="btn" onclick="aller(\'suivi\')">Suivre mon colis</button>'+
+  E.paye=(moyen==="carte");
+  var base=
+    '<div class="bloc">🛬 Arrivée à notre centre de '+ville()+' le <b>'+dTxt(v.arr)+'</b></div>'+
+    '<div class="bloc">'+s.i+' <b>'+s.n+'</b><br>'+(s.id==="ret"?adresseRetrait():(s.note?s.note:s.d))+'</div>'+
+    '<div class="bloc">💬 Le destinataire reçoit un lien WhatsApp au '+(versCI()?"+225":"+33")+' '+E.tel+'.</div>';
+  var liens=
     '<button class="btn btn-2" onclick="aller(\'dest\')">Voir ce que reçoit le destinataire</button>'+
     '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+
+  if(moyen==="carte"){
+    document.getElementById("confirm").innerHTML=
+      '<h2 style="text-align:center">C\'est parti !</h2>'+
+      '<div class="bandeau-vert" style="text-align:center"><small>Votre numéro de suivi</small><span class="num">'+E.num+'</span><small>Paiement reçu · vol du '+dTxt(v.dep)+'</small></div>'+
+      base+'<button class="btn" onclick="aller(\'suivi\')">Suivre mon colis</button>'+liens;
+    aller("confirm");return;
+  }
+
+  var c=COMPTES[moyen];
+  document.getElementById("confirm").innerHTML=
+    '<h2>Dernière étape : le virement</h2>'+
+    '<div class="attente-box">⏳ <b>Paiement en attente</b><br>Votre colis ne partira qu\'une fois le virement vérifié.</div>'+
+    '<div class="virement">'+
+      '<div class="vl"><span>Envoyer à</span><b>'+c.i+' '+c.n+'</b></div>'+
+      '<div class="vl"><span>Numéro</span><b class="copiable" onclick="cop(this,\''+c.num+'\')">'+c.num+' ⧉</b></div>'+
+      '<div class="vl"><span>Titulaire</span><b>'+c.titulaire+'</b></div>'+
+      '<div class="vl"><span>Montant exact</span><b class="copiable" onclick="cop(this,\''+fmt(E.total)+'\')">'+fmt(E.total)+' ⧉</b></div>'+
+      '<div class="vl ref"><span>Référence obligatoire</span><b class="copiable" onclick="cop(this,\''+E.num+'\')">'+E.num+' ⧉</b></div>'+
+    '</div>'+
+    '<div class="alerte">⚠️ Inscrivez <b>'+E.num+'</b> dans le motif du virement. Sans cette référence, nous ne pourrons pas identifier votre paiement.<br><br>Le compte est au nom de <b>YOBOUÉ</b>, gérant de BABI SHIP. C\'est normal.</div>'+
+    '<label class="lab">Capture d\'écran du virement <span style="font-weight:400;color:var(--doux)">(facultatif, accélère la vérification)</span></label>'+
+    '<button class="ligne" onclick="simuPhoto(this)"><span class="ico">📎</span><span><span class="nom">Joindre une capture</span><span class="det">Depuis votre galerie</span></span></button>'+
+    '<button class="btn" onclick="declare()">J\'ai effectué le virement</button>'+
+    '<p class="aide" style="text-align:center">Vérification sous 2 heures ouvrées. Vous serez prévenu sur WhatsApp.</p>'+
+    '<div style="height:20px"></div>'+base+liens;
   aller("confirm");
 }
+function cop(el,txt){var o=el.innerHTML;el.innerHTML="copié ✓";setTimeout(function(){el.innerHTML=o;},1400);}
+function simuPhoto(el){el.querySelector(".nom").textContent="Capture jointe ✓";el.setAttribute("aria-pressed","true");}
+function declare(){
+  var v=VOLS[Number(E.vol)];
+  document.getElementById("confirm").innerHTML=
+    '<h2 style="text-align:center">Virement déclaré</h2>'+
+    '<div class="bandeau-vert" style="text-align:center"><small>Votre numéro de suivi</small><span class="num">'+E.num+'</span><small>Paiement en cours de vérification</small></div>'+
+    '<div class="attente-box">⏳ Nous vérifions votre virement. Vous recevrez une confirmation sur WhatsApp sous 2 heures ouvrées. Votre place sur le vol du '+dTxt(v.dep)+' est réservée jusque-là.</div>'+
+    '<button class="btn" onclick="aller(\'suivi\')">Suivre mon colis</button>'+
+    '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+  window.scrollTo(0,0);
+}
 
-/* ---------- suivi ---------- */
-var avance=2;
+var avance=3;
 function rendreSuivi(){
-  var num=E.num||"BS-230755", d=E.date||dateTexte(joursOuvres(GRILLE.fr.delai));
+  var num=E.num||"BS-230755";
+  var v=(E.vol!==null&&VOLS.length)?VOLS[Number(E.vol)]:null;
+  if(!v){VOLS=vols();v=VOLS[1];}
+  var arr=dTxt(v.arr);
   var h='<h2>Suivi du colis</h2>'+
-    '<div class="bandeau-vert"><small>Numéro de suivi</small><span class="num">'+num+'</span><small>'+(E.sens?(versCI()?"France → Abidjan":"Abidjan → France"):"France → Abidjan")+' · livraison prévue le '+d+'</small></div>'+
-    '<button class="btn" onclick="alert(\'Démonstration : ouvrirait WhatsApp avec le lien de suivi.\')">Partager sur WhatsApp</button>'+
-    '<button class="btn btn-2" onclick="copier(this)">Copier le numéro</button>'+
-    '<ul class="tl">';
-  var STATUTS=statuts(!E.sens||versCI());
+    '<div class="bandeau-vert"><small>Numéro de suivi</small><span class="num">'+num+'</span><small>'+(E.sens?(versCI()?"France → Abidjan":"Abidjan → France"):"France → Abidjan")+' · arrivée prévue le '+arr+'</small></div>'+
+    '<a class="btn" href="https://wa.me/?text="+encodeURIComponent("Suivi de mon colis BABI SHIP : "+num)+"" target="_blank" rel="noopener">Partager sur WhatsApp</a>'+
+    '<button class="btn btn-2" onclick="copier(this)">Copier le numéro</button><ul class="tl">';
   STATUTS.forEach(function(s,i){
-    h+='<li class="'+(i<avance?"ok":"")+'"><span class="rond">'+ICO[i]+'</span><span><b>'+s+'</b>'+(i<avance?'<span>Aujourd\'hui</span>':(i===STATUTS.length-1?'<span>Prévu le '+d+'</span>':''))+'</span></li>';
+    h+='<li class="'+(i<avance?"ok":"")+'"><span class="rond">'+ICO[i]+'</span><span><b>'+s+'</b>'+(i<avance?'<span>Aujourd\'hui</span>':(i===4?'<span>Prévu le '+arr+'</span>':''))+'</span></li>';
   });
-  h+='</ul><button class="btn btn-2" onclick="avancer()">▶ Faire avancer le colis (démo)</button>'+
-     '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+  h+='</ul><button class="btn btn-2" onclick="avancer()">▶ Faire avancer le colis (démo)</button><button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
   document.getElementById("suivi").innerHTML=h;
 }
-function avancer(){ avance = avance>=ICO.length ? 1 : avance+1; rendreSuivi(); }
-function copier(b){ b.textContent="Numéro copié ✓"; setTimeout(function(){b.textContent="Copier le numéro";},1800); }
+function avancer(){avance=avance>=STATUTS.length?1:avance+1;rendreSuivi();}
+function copier(b){b.textContent="Numéro copié ✓";setTimeout(function(){b.textContent="Copier le numéro";},1800);}
 
-/* ---------- vue destinataire ---------- */
 function rendreDest(){
   document.getElementById("dest").innerHTML=
     '<div class="note">Voici la page que reçoit le destinataire par WhatsApp. Aucun compte, aucune application.</div>'+
     '<h2>Un colis arrive pour vous</h2>'+
-    '<div class="bloc">📦 Colis '+(E.num||"BS-230755")+' · arrivée prévue le '+(E.date||dateTexte(joursOuvres(GRILLE.fr.delai)))+'</div>'+
-    '<p class="aide" style="margin:18px 0 10px">Indiquez où vous livrer. Touchez la carte pour poser votre repère.</p>'+
-    carteSVG()+
+    '<div class="bloc">📦 Colis '+(E.num||"BS-230755")+'</div>'+
+    '<p class="aide" style="margin:18px 0 10px">Indiquez où vous livrer. Touchez la carte pour poser votre repère.</p>'+carteSVG()+
     '<label class="lab">Un repère</label><input placeholder="Ex. : portail bleu en face de la pharmacie">'+
     '<label class="lab">Votre WhatsApp</label><div class="tel"><span class="ind">+225</span><input placeholder="07 00 00 00 00"></div>'+
-    '<button class="btn" onclick="alert(\'Démonstration : le livreur reçoit le point et le repère.\')">Valider mon adresse</button>'+
+    '<button class="btn" onclick="alert(\'Merci ! Le livreur a bien reçu votre point de repère.\')">Valider mon adresse</button>'+
     '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
 }
 </script>
