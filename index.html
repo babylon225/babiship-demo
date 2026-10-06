@@ -242,7 +242,7 @@ function prixFret(kg){
   var L=liaison(); if(!L) return 0;
   var p=Math.max(kg, L.mini)*L.kg + L.dossier;
   var marge=Math.max(p*(MARGE-1), PLANCHER);
-  return Math.round((p+marge)*100)/100;
+  return Math.round(p+marge);
 }
 
 var TAILLES=[
@@ -253,6 +253,8 @@ var TAILLES=[
  {id:"gv", i:"🧳",n:"Une grande valise",d:"Jusqu'à 23 kg",p:196},
  {id:"pg", i:"🚚",n:"Plus gros",d:"On vous fait un devis",p:null}];
 var POINTS=[{n:"Point BABI SHIP Riviera 2",q:"Cocody"},{n:"Point BABI SHIP Zone 4",q:"Marcory"},{n:"Point BABI SHIP Liberté",q:"Adjamé"}];
+var POINTS_LIAISON={"par-abj":[],"lil-abj":[{n:"Point BABI SHIP Lille",q:"46 rue du capitaine Ferber, 59000 Lille · Métro Portes de Douai"}]};
+function points(){var L=liaison();if(L&&POINTS_LIAISON.hasOwnProperty(L.id))return POINTS_LIAISON[L.id];return POINTS;}
 var SORTIE_FR=[
  {id:"ret",i:"🏢",n:"Retrait à notre point Paris",d:"Adresse communiquée après paiement · du lundi au samedi",p:0,note:"Compris dans votre prix · 48 h de stockage offertes, puis 3 €/jour"},
  {id:"dpd",i:"🚚",n:"DPD",d:"À domicile sous 24 à 48 h",p:10},
@@ -294,10 +296,12 @@ reset();
 function dTxt(d){var J=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."],M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];return J[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];}
 function esp(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g," ");}
 function versCI(){var L=liaison();return L?L.pays==="fr":E.sens==="fr";}
-function fmt(eur){return versCI()? (Math.round(eur*100)/100)+" €" : esp(Math.round(eur*655.957/100)*100)+" FCFA";}
+function fcfa(eur){return esp(Math.round(eur*655.957/100)*100)+" FCFA";}
+function fmt(eur){return versCI()? Math.round(eur)+" €" : esp(Math.round(eur*655.957/100)*100)+" FCFA";}
 function trouve(t,id){for(var i=0;i<t.length;i++)if(t[i].id===id)return t[i];return null;}
 function sorties(){return versCI()?SORTIE_CI:SORTIE_FR;}
 function ville(){var L=liaison();return L?L.arr:"Abidjan";}
+function deV(v){return /^[AEIOUYÉÈaeiouy]/.test(v)?"d'"+v:"de "+v;}
 function villeDep(){var L=liaison();return L?L.dep:"Paris";}
 
 function vols(){
@@ -316,7 +320,7 @@ function vols(){
 
 function prixFretL(L,kg){
   var p=Math.max(kg,L.mini)*L.kg + L.dossier;
-  return Math.round((p+Math.max(p*(MARGE-1),PLANCHER))*100)/100;
+  return Math.round(p+Math.max(p*(MARGE-1),PLANCHER));
 }
 function choisirLiaison(id){
   E.liaison=id;
@@ -430,17 +434,22 @@ function ecran(n){
 
   if(n===5){
     E.fret=prixFret(E.poids);
-    var h='<h2>Choisissez votre vol</h2><p class="aide" style="margin:0 0 14px">Départ '+villeDep()+' → arrivée à notre centre de '+ville()+'.</p>';
+    var h='<h2>Choisissez votre vol</h2><p class="aide" style="margin:0 0 14px">Départ '+villeDep()+' → arrivée à notre centre '+deV(ville())+'.</p>';
     VOLS.forEach(function(v){h+=lig("vol",String(v.id),"✈️","Départ "+dTxt(v.dep),"Arrivée le "+dTxt(v.arr),v.places+"<small>places</small>");});
     return h+cont(E.vol);
   }
 
-  if(n===6) return '<h2>Comment nous remettez-vous le colis ?</h2>'+
+  if(n===6){
+    var pts=points();
+    if(!pts.length&&E.remise==="depot")E.remise=null;
+    if(E.point!==null&&!pts[Number(E.point)])E.point=null;
+    return '<h2>Comment nous remettez-vous le colis ?</h2>'+
     lig("remise","collecte","🏠","On vient chez vous","Collecte à domicile, incluse")+
-    lig("remise","depot","📍","Je dépose le colis","Au point BABI SHIP le plus proche")+cont(E.remise);
+    (pts.length?lig("remise","depot","📍","Je dépose le colis",pts.length===1?pts[0].n:"Au point BABI SHIP le plus proche"):"")+cont(E.remise);
+  }
 
   if(n===7){
-    if(E.remise==="depot"){var h='<h2>Où déposez-vous le colis ?</h2>';POINTS.forEach(function(p,i){h+=lig("point",String(i),"📍",p.n,p.q);});return h+cont(E.point);}
+    if(E.remise==="depot"){var h='<h2>Où déposez-vous le colis ?</h2>';points().forEach(function(p,i){h+=lig("point",String(i),"📍",p.n,p.q);});return h+cont(E.point);}
     if(versCI()) return '<h2>Votre adresse</h2>'+
       '<button class="ligne" aria-pressed="true"><span class="ico">🏠</span><span><span class="nom">12 rue Doudeauville</span><span class="det">75018 Paris</span></span></button>'+
       '<label class="lab">Complément <span style="font-weight:400;color:var(--doux)">(facultatif)</span></label><input placeholder="Étage, digicode, bâtiment">'+
@@ -454,7 +463,7 @@ function ecran(n){
   if(n===8){
     var v=VOLS[Number(E.vol)];
     var h='<h2>À l\'arrivée à '+ville()+', que fait-on ?</h2>'+
-      '<div class="info">Colis à notre centre de '+ville()+' le <strong>'+dTxt(v.arr)+'</strong></div><div style="height:14px"></div>';
+      '<div class="info">Colis à notre centre '+deV(ville())+' le <strong>'+dTxt(v.arr)+'</strong></div><div style="height:14px"></div>';
     sorties().forEach(function(s){h+=lig("sortie",s.id,s.i,s.n,(s.note?s.note:s.d),s.p===0?"Inclus":"+ "+fmt(s.p));});
     return h+cont(E.sortie);
   }
@@ -514,7 +523,7 @@ function terminer(moyen){
   E.num="BS-"+Math.floor(100000+Math.random()*899999);
   E.paye=(moyen==="carte");
   var base=
-    '<div class="bloc">🛬 Arrivée à notre centre de '+ville()+' le <b>'+dTxt(v.arr)+'</b></div>'+
+    '<div class="bloc">🛬 Arrivée à notre centre '+deV(ville())+' le <b>'+dTxt(v.arr)+'</b></div>'+
     '<div class="bloc">'+s.i+' <b>'+s.n+'</b><br>'+(s.id==="ret"?adresseRetrait():(s.note?s.note:s.d))+'</div>'+
     '<div class="bloc">💬 Le destinataire reçoit un lien WhatsApp au '+(versCI()?"+225":"+33")+' '+E.tel+'.</div>';
   var liens=
@@ -530,6 +539,7 @@ function terminer(moyen){
   }
 
   var c=COMPTES[moyen];
+  var montant=fcfa(E.total);
   document.getElementById("confirm").innerHTML=
     '<h2>Dernière étape : le virement</h2>'+
     '<div class="attente-box">⏳ <b>Paiement en attente</b><br>Votre colis ne partira qu\'une fois le virement vérifié.</div>'+
@@ -537,7 +547,8 @@ function terminer(moyen){
       '<div class="vl"><span>Envoyer à</span><b>'+c.i+' '+c.n+'</b></div>'+
       '<div class="vl"><span>Numéro</span><b class="copiable" onclick="cop(this,\''+c.num+'\')">'+c.num+' ⧉</b></div>'+
       '<div class="vl"><span>Titulaire</span><b>'+c.titulaire+'</b></div>'+
-      '<div class="vl"><span>Montant exact</span><b class="copiable" onclick="cop(this,\''+fmt(E.total)+'\')">'+fmt(E.total)+' ⧉</b></div>'+
+      '<div class="vl"><span>Montant exact</span><b class="copiable" onclick="cop(this,\''+montant+'\')">'+montant+' ⧉</b></div>'+
+      (versCI()?'<div class="vl"><span>Soit</span><b>'+fmt(E.total)+'</b></div>':'')+
       '<div class="vl ref"><span>Référence obligatoire</span><b class="copiable" onclick="cop(this,\''+E.num+'\')">'+E.num+' ⧉</b></div>'+
     '</div>'+
     '<div class="alerte">⚠️ Inscrivez <b>'+E.num+'</b> dans le motif du virement. Sans cette référence, nous ne pourrons pas identifier votre paiement.<br><br>Le compte est au nom de <b>YOBOUÉ</b>, gérant de BABI SHIP. C\'est normal.</div>'+
