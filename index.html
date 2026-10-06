@@ -196,7 +196,7 @@ footer{border-top:1px solid var(--bord);padding:24px 0 40px;color:var(--doux);fo
     <details><summary>Combien de temps puis-je laisser le colis avant de le retirer ?</summary><p>48 heures de stockage sont offertes après l'arrivée à notre centre. Au-delà, un forfait journalier s'applique.</p></details>
     <details><summary>Le retrait sur place est-il payant ?</summary><p>Non. Il est compris dans le prix réglé au départ. Rien à payer en venant chercher le colis.</p></details>
     <details><summary>Puis-je choisir mon transporteur pour la livraison finale ?</summary><p>Oui. DPD, Chronopost, UPS : vous choisissez, le prix est affiché, et tout est payé en une seule fois.</p></details>
-    <details><summary>Que puis-je envoyer ?</summary><p>Vêtements, chaussures, denrées sèches, sauces sans viande ni lait, cosmétiques, appareils, artisanat. La viande, le lait, les fruits frais et l'alcool sont refusés. <a href="produits.html" style="color:var(--vert)">Voir la liste complète</a>.</p></details><details><summary>Et si le destinataire n'a pas d'adresse précise ?</summary><p>Il reçoit un lien WhatsApp et pose lui-même son repère sur la carte.</p></details>
+    <details><summary>Que puis-je envoyer ?</summary><p>Vêtements, chaussures, denrées sèches, sauces sans viande ni lait, cosmétiques, appareils, artisanat. La viande, le lait, les fruits frais et l'alcool sont refusés. Voir la liste complète.</p></details><details><summary>Et si le destinataire n'a pas d'adresse précise ?</summary><p>Il reçoit un lien WhatsApp et pose lui-même son repère sur la carte.</p></details>
   </section>
 </div></div>
 
@@ -210,9 +210,26 @@ footer{border-top:1px solid var(--bord);padding:24px 0 40px;color:var(--doux);fo
 <div class="vue" id="v-suivi"><div class="wrap"><div class="etape" id="suivi"></div></div></div>
 <div class="vue" id="v-dest"><div class="wrap"><div class="etape" id="dest"></div></div></div>
 
-<footer><div class="wrap">BABI SHIP · Abidjan ⇄ France / Europe<br>WhatsApp : <a href="https://wa.me/33695607868" style="color:var(--vert)">nous écrire</a></div></footer>
+<footer><div class="wrap">BABI SHIP · Abidjan ⇄ France / Europe<br>WhatsApp : <a href="https://wa.me/33695607868" style="color:var(--vert)">nous écrire</a>
+  <details id="mentions" style="margin-top:14px"><summary>Mentions légales</summary><div id="mentions-txt"></div></details>
+</div></footer>
 
 <script>
+// ===== À COMPLÉTER PAR LE PROPRIÉTAIRE (laisser "" tant que l'info n'est pas connue) =====
+var CONFIG={
+  email:"",          // adresse e-mail de réception des commandes
+  iban:"",           // IBAN du compte de réception des virements
+  bic:"",            // BIC (facultatif)
+  titulaire:"",      // nom du titulaire du compte bancaire
+  paypal:"",         // adresse PayPal ou lien paypal.me
+  societe:"",        // raison sociale
+  forme:"",          // forme juridique (ex. SAS, EI…)
+  siret:"",
+  siege:"",          // adresse du siège
+  directeur:""       // directeur de publication
+};
+var WA="33695607868";
+
 var CONTENUS=[{id:"vet",i:"👕",n:"Vêtements"},{id:"cha",i:"👟",n:"Chaussures"},{id:"ali",i:"🥫",n:"Alimentaire"},{id:"bea",i:"🧴",n:"Beauté"},{id:"tel",i:"📱",n:"Téléphone, appareil"},{id:"doc",i:"📄",n:"Documents"},{id:"cad",i:"🎁",n:"Cadeaux, divers"}];
 
 var MARGE=1.25;  // +25 % appliqués à tous les tarifs fournisseurs
@@ -238,6 +255,8 @@ var LIAISONS=[
 var PLANCHER=8;  // frais de service minimum, en euros
 
 function liaison(){ return trouve(LIAISONS, E.liaison); }
+function bateau(){var L=liaison();return !!(L&&L.mode==="bateau");}
+function poidsMax(){return bateau()?100:30;}
 function prixFret(kg){
   var L=liaison(); if(!L) return 0;
   var p=Math.max(kg, L.mini)*L.kg + L.dossier;
@@ -265,7 +284,7 @@ var SORTIE_CI=[
  {id:"ret",i:"🏢",n:"Retrait à un point BABI SHIP",d:"Point communiqué après paiement · 7 j/7",p:0,note:"Compris dans votre prix · 48 h de stockage offertes, puis 2 000 FCFA/jour"},
  {id:"dom",i:"🛵",n:"Livraison à domicile par notre livreur",d:"Abidjan et communes · créneau convenu par WhatsApp",p:8},
  {id:"exp",i:"⚡",n:"Livraison express le jour même",d:"Commandée avant 12 h · Abidjan uniquement",p:16}];
-var STATUTS=["Paiement confirmé","Colis enregistré","Colis pris en charge","Au centre de départ","En vol","Arrivé au centre de distribution","En cours de livraison","Livré"];
+var STATUTS=["Paiement confirmé","Colis enregistré","Colis pris en charge","Au centre de départ","En vol / En mer","Arrivé au centre de distribution","En cours de livraison","Livré"];
 var ICO=["💰","📝","📦","🏢","✈️","🛬","🛵","✅"];
 
 
@@ -290,7 +309,7 @@ var REGLES={
 };
 var INTERDIT_TOUJOURS=["Stupéfiants","Armes et munitions","Produits inflammables, gaz, briquets","Espèces et objets de grande valeur non déclarés"];
 var E={},pas=1,TOTAL=11,VOLS=[];
-function reset(){E={sens:null,liaison:null,poids:5,contenu:null,declare:false,taille:null,vol:null,remise:null,pin:null,pinXY:null,repere:"",point:null,sortie:null,moyen:null,paye:false,tel:"",fret:0,dernier:0,total:0,num:null};}
+function reset(){E={sens:null,liaison:null,poids:5,contenu:null,declare:false,taille:null,vol:null,remise:null,pin:null,pinXY:null,repere:"",point:null,sortie:null,moyen:null,paye:false,tel:"",nomExp:"",telExp:"",nomDest:"",telDest:"",adr:"",cp:"",villeC:"",compl:"",fret:0,dernier:0,total:0,num:null};}
 reset();
 
 function dTxt(d){var J=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."],M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];return J[d.getDay()]+" "+d.getDate()+" "+M[d.getMonth()];}
@@ -299,7 +318,7 @@ function versCI(){var L=liaison();return L?L.pays==="fr":E.sens==="fr";}
 function fcfa(eur){return esp(Math.round(eur*655.957/100)*100)+" FCFA";}
 function fmt(eur){return versCI()? Math.round(eur)+" €" : esp(Math.round(eur*655.957/100)*100)+" FCFA";}
 function trouve(t,id){for(var i=0;i<t.length;i++)if(t[i].id===id)return t[i];return null;}
-function sorties(){return versCI()?SORTIE_CI:SORTIE_FR;}
+function sorties(){if(!versCI())SORTIE_FR[0].n="Retrait à notre point "+ville();return versCI()?SORTIE_CI:SORTIE_FR;}
 function ville(){var L=liaison();return L?L.arr:"Abidjan";}
 function deV(v){return /^[AEIOUYÉÈaeiouy]/.test(v)?"d'"+v:"de "+v;}
 function villeDep(){var L=liaison();return L?L.dep:"Paris";}
@@ -331,7 +350,7 @@ function choisirLiaison(id){
   rendre();
 }
 function majPoids(v){
-  v=Math.max(1,Math.min(30,Math.round(Number(v))));
+  v=Math.max(1,Math.min(poidsMax(),Math.round(Number(v))));
   E.poids=v;
   var a=document.getElementById("pval"), b=document.getElementById("pprix"), c=document.querySelector(".slider");
   if(a)a.textContent=v;
@@ -370,6 +389,14 @@ function poserPin(ev){
 }
 function validerPin(){var r=document.getElementById("rep");if(r)E.repere=r.value;suivant();}
 function majTel(v){E.tel=v.replace(/\s/g,"");document.getElementById("btn-tel").disabled=E.tel.length<6;}
+function att(s){return String(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+function val(id){var e=document.getElementById(id);return e?e.value:"";}
+function indDep(){return versCI()?"+33":"+225";}
+function indArr(){return versCI()?"+225":"+33";}
+function coordOk(){return E.nomExp.trim().length>=2&&E.telExp.replace(/\s/g,"").length>=6&&E.nomDest.trim().length>=2&&E.telDest.replace(/\s/g,"").length>=6;}
+function majCoord(){E.nomExp=val("k-nomExp");E.telExp=val("k-telExp");E.nomDest=val("k-nomDest");E.telDest=val("k-telDest");E.tel=E.telDest.replace(/\s/g,"");document.getElementById("btn-tel").disabled=!coordOk();}
+function adrOk(){return E.adr.trim().length>=3&&E.cp.trim().length>=4&&E.villeC.trim().length>=2;}
+function majAdr(){E.adr=val("c-adr");E.cp=val("c-cp");E.villeC=val("c-ville");E.compl=val("c-compl");document.getElementById("btn-adr").disabled=!adrOk();}
 function payer(el){var l=el.parentNode.querySelectorAll(".ligne");for(var i=0;i<l.length;i++)l[i].setAttribute("aria-pressed","false");el.setAttribute("aria-pressed","true");}
 
 function ecran(n){
@@ -418,24 +445,24 @@ function ecran(n){
     var L=liaison();
     var h='<h2>Combien pèse votre colis ?</h2>'+
       '<p class="aide" style="margin:0 0 14px">Minimum facturé sur cette liaison : '+L.mini+' kg.</p>'+
-      '<div class="poids-box"><button class="pm" onclick="majPoids('+(E.poids-1)+')">−</button>'+
+      '<div class="poids-box"><button class="pm" onclick="majPoids(E.poids-1)">−</button>'+
       '<span class="pv"><b id="pval">'+E.poids+'</b> kg</span>'+
-      '<button class="pm" onclick="majPoids('+(E.poids+1)+')">+</button></div>'+
-      '<input type="range" min="1" max="30" value="'+E.poids+'" oninput="majPoids(this.value)" class="slider">'+
+      '<button class="pm" onclick="majPoids(E.poids+1)">+</button></div>'+
+      '<input type="range" min="1" max="'+poidsMax()+'" value="'+E.poids+'" oninput="majPoids(this.value)" class="slider">'+
       '<div class="reperes">';
     [[1,"✉️","Enveloppe"],[2,"👟","Une paire"],[7,"📦","Un carton"],[10,"🧳","Valise cabine"],[23,"🧳","Grande valise"]].forEach(function(r){
       h+='<button class="rep" onclick="majPoids('+r[0]+')"><span>'+r[1]+'</span><small>'+r[2]+'<br>'+r[0]+' kg</small></button>';
     });
     h+='</div>'+
       '<div class="prix-boite" style="margin-top:18px"><span class="prix" id="pprix">'+fmt(prixFret(E.poids))+'</span><p class="prix-note">Transport tout compris</p></div>'+
-      '<p class="aide">Au-delà de 30 kg, demandez un devis sur WhatsApp.</p>';
+      '<p class="aide">Au-delà de '+poidsMax()+' kg, demandez un devis sur WhatsApp.</p>';
     return h+'<button class="btn" onclick="suivant()">Continuer</button>';
   }
 
   if(n===5){
     E.fret=prixFret(E.poids);
-    var h='<h2>Choisissez votre vol</h2><p class="aide" style="margin:0 0 14px">Départ '+villeDep()+' → arrivée à notre centre '+deV(ville())+'.</p>';
-    VOLS.forEach(function(v){h+=lig("vol",String(v.id),"✈️","Départ "+dTxt(v.dep),"Arrivée le "+dTxt(v.arr),v.places+"<small>places</small>");});
+    var h='<h2>'+(bateau()?'Choisissez votre départ':'Choisissez votre vol')+'</h2><p class="aide" style="margin:0 0 14px">Départ '+villeDep()+' → arrivée à notre centre '+deV(ville())+'.</p>';
+    VOLS.forEach(function(v){h+=lig("vol",String(v.id),bateau()?"🚢":"✈️","Départ "+dTxt(v.dep),"Arrivée le "+dTxt(v.arr),v.places+"<small>places</small>");});
     return h+cont(E.vol);
   }
 
@@ -451,9 +478,11 @@ function ecran(n){
   if(n===7){
     if(E.remise==="depot"){var h='<h2>Où déposez-vous le colis ?</h2>';points().forEach(function(p,i){h+=lig("point",String(i),"📍",p.n,p.q);});return h+cont(E.point);}
     if(versCI()) return '<h2>Votre adresse</h2>'+
-      '<button class="ligne" aria-pressed="true"><span class="ico">🏠</span><span><span class="nom">12 rue Doudeauville</span><span class="det">75018 Paris</span></span></button>'+
-      '<label class="lab">Complément <span style="font-weight:400;color:var(--doux)">(facultatif)</span></label><input placeholder="Étage, digicode, bâtiment">'+
-      '<button class="btn" onclick="suivant()">Continuer</button>';
+      '<label class="lab">Adresse</label><input id="c-adr" value="'+att(E.adr)+'" placeholder="Numéro et rue" autocomplete="street-address" oninput="majAdr()">'+
+      '<label class="lab">Code postal</label><input id="c-cp" value="'+att(E.cp)+'" placeholder="75000" inputmode="numeric" autocomplete="postal-code" oninput="majAdr()">'+
+      '<label class="lab">Ville</label><input id="c-ville" value="'+att(E.villeC)+'" placeholder="Ville" autocomplete="address-level2" oninput="majAdr()">'+
+      '<label class="lab">Complément <span style="font-weight:400;color:var(--doux)">(facultatif)</span></label><input id="c-compl" value="'+att(E.compl)+'" placeholder="Étage, digicode, bâtiment" oninput="majAdr()">'+
+      '<button class="btn" id="btn-adr" onclick="suivant()" '+(adrOk()?"":"disabled")+'>Continuer</button>';
     return '<h2>Où venons-nous chercher le colis ?</h2><p class="aide" style="margin:0 0 12px">Touchez la carte pour poser le pin.</p>'+carteSVG()+
       '<p class="pin-info">'+(E.pin?"📍 Pin posé · "+E.pin:"Aucun pin posé")+'</p>'+
       '<label class="lab">Un repère</label><input id="rep" value="'+E.repere+'" placeholder="Ex. : portail bleu en face de la pharmacie">'+
@@ -468,10 +497,12 @@ function ecran(n){
     return h+cont(E.sortie);
   }
 
-  if(n===9) return '<h2>Le WhatsApp de la personne qui reçoit</h2>'+
-    '<div class="tel"><span class="ind">'+(versCI()?"+225":"+33")+'</span><input id="tel" value="'+E.tel+'" placeholder="07 00 00 00 00" oninput="majTel(this.value)"></div>'+
-    '<p class="aide">📍 Elle recevra un lien pour indiquer elle-même où livrer.</p>'+
-    '<button class="btn" id="btn-tel" onclick="suivant()" '+(E.tel.length>=6?"":"disabled")+'>Continuer</button>';
+  if(n===9) return '<h2>Vos coordonnées</h2>'+
+    '<label class="lab">Votre nom et prénom</label><input id="k-nomExp" value="'+att(E.nomExp)+'" placeholder="Prénom Nom" autocomplete="name" oninput="majCoord()">'+
+    '<label class="lab">Votre WhatsApp</label><div class="tel"><span class="ind">'+indDep()+'</span><input id="k-telExp" value="'+att(E.telExp)+'" placeholder="'+(versCI()?"06 00 00 00 00":"07 00 00 00 00")+'" inputmode="tel" oninput="majCoord()"></div>'+
+    '<label class="lab">Nom du destinataire</label><input id="k-nomDest" value="'+att(E.nomDest)+'" placeholder="Prénom Nom" oninput="majCoord()">'+
+    '<label class="lab">WhatsApp du destinataire</label><div class="tel"><span class="ind">'+indArr()+'</span><input id="k-telDest" value="'+att(E.telDest)+'" placeholder="'+(versCI()?"07 00 00 00 00":"06 00 00 00 00")+'" inputmode="tel" oninput="majCoord()"></div>'+
+    '<button class="btn" id="btn-tel" onclick="suivant()" '+(coordOk()?"":"disabled")+'>Continuer</button>';
 
   if(n===10){
     var L=liaison(),c=trouve(CONTENUS,E.contenu),s=trouve(sorties(),E.sortie),v=VOLS[Number(E.vol)];
@@ -482,7 +513,7 @@ function ecran(n){
       '<div class="recap">'+
         '<div><span>Liaison</span><b>'+L.dep+' → '+L.arr+' '+L.ico+'</b></div>'+
         '<div><span>Contenu</span><b>'+c.i+' '+c.n+' ✓</b></div>'+
-        '<div><span>Vol</span><b>Départ '+dTxt(v.dep)+'</b></div>'+
+        '<div><span>'+(bateau()?'Bateau':'Vol')+'</span><b>Départ '+dTxt(v.dep)+'</b></div>'+
         '<div><span>Transport · '+E.poids+' kg</span><b>'+fmt(E.fret)+'</b></div>'+
         '<div><span>'+s.n+'</span><b>'+(s.p===0?"Inclus":fmt(s.p))+'</b></div>'+
         '<div class="tot"><span>Total</span><b>'+fmt(E.total)+'</b></div>'+
@@ -493,16 +524,16 @@ function ecran(n){
 
   if(n===11){
     var m=versCI()
-      ?[["carte","💳","Carte bancaire","Lien de paiement envoyé sur WhatsApp"],
-        ["wave","🌊","Wave","Virement vers notre numéro Wave"],
-        ["om","🟠","Orange Money","Virement vers notre numéro Orange Money"]]
+      ?[["virement","🏦","Virement bancaire","Coordonnées bancaires à l'étape suivante"],
+        ["paypal","🅿️","PayPal","Paiement vers notre compte PayPal"],
+        ["carte","💳","Carte bancaire","Lien de paiement envoyé sur WhatsApp"]]
       :[["wave","🌊","Wave","Virement vers notre numéro Wave"],
         ["om","🟠","Orange Money","Virement vers notre numéro Orange Money"],
         ["carte","💳","Carte bancaire","Lien de paiement envoyé sur WhatsApp"]];
     var h='<h2>Paiement</h2>';
     m.forEach(function(x){h+=lig("moyen",x[0],x[1],x[2],x[3]);});
     if(E.moyen==="carte") h+='<div class="attente-box">💳 Le paiement par carte arrive très bientôt.<br>En attendant, finalisez votre commande sur WhatsApp : nous vous envoyons un lien de paiement sécurisé.</div>'+
-      '<a class="btn" href="https://wa.me/33695607868?text="+encodeURIComponent("Bonjour, je souhaite envoyer un colis "+(versCI()?"France vers Abidjan":"Abidjan vers la France")+". Montant : "+fmt(E.total)+". Je voudrais payer par carte.")+"" target="_blank" rel="noopener">💬 Finaliser sur WhatsApp</a>';
+      '<button class="btn" onclick="terminer(\'carte\')">Continuer · '+fmt(E.total)+'</button>';
     else if(E.moyen) h+='<button class="btn" onclick="terminer(\''+E.moyen+'\')">Continuer · '+fmt(E.total)+'</button>';
     else h+='<button class="btn" disabled>Choisissez un moyen de paiement</button>';
     return h;
@@ -513,10 +544,35 @@ function ecran(n){
 var COMPTES={wave:{n:"Wave",i:"🌊",num:"+225 07 08 73 38 28",titulaire:"YOBOUÉ (BABI SHIP)"},
              om:{n:"Orange Money",i:"🟠",num:"+225 07 08 73 38 28",titulaire:"YOBOUÉ (BABI SHIP)"}};
 
+var RETRAITS={Paris:"1 avenue Louis Blériot, 93120 La Courneuve",Lille:"46 rue du capitaine Ferber, 59000 Lille",Abidjan:"Point BABI SHIP Riviera 2, Cocody"};
 function adresseRetrait(){
-  return versCI()
-    ? "Point BABI SHIP Riviera 2, Cocody<br>Ouvert 7 j/7, 9 h – 19 h<br>Présentez votre numéro de suivi.<br><small>48 h de stockage offertes, puis 2 000 FCFA/jour.</small>"
-    : "18 rue de la Chapelle, 93200 Saint-Denis<br>Du lundi au samedi, 10 h – 18 h<br>Présentez votre numéro de suivi.<br><small>48 h de stockage offertes, puis 3 €/jour.</small>";
+  return (RETRAITS[ville()]||RETRAITS.Abidjan)+"<br>Horaires communiqués par WhatsApp après confirmation<br>Présentez votre numéro de suivi.<br><small>48 h de stockage offertes, puis "+(versCI()?"2 000 FCFA":"3 €")+"/jour.</small>";
+}
+var MOYENS={virement:"Virement bancaire",paypal:"PayPal",carte:"Carte bancaire",wave:"Wave",om:"Orange Money"};
+function recapTexte(){
+  var L=liaison(),v=VOLS[Number(E.vol)],c=trouve(CONTENUS,E.contenu),s=trouve(sorties(),E.sortie);
+  var remise,adr;
+  if(E.remise==="depot"){var p=points()[Number(E.point)];remise="Dépôt au point "+(p?p.n+(p.q?" ("+p.q+")":""):"");adr="Sans objet (dépôt au point)";}
+  else{remise="Collecte à domicile";adr=versCI()?(E.adr+", "+E.cp+" "+E.villeC+(E.compl?" — "+E.compl:"")):("Repère : "+(E.repere||"non précisé")+" — commune : "+(E.pin||"non précisée"));}
+  return "NOUVELLE COMMANDE BABI SHIP\n"+
+    "Réf : "+E.num+"\n\n"+
+    "Expéditeur : "+E.nomExp+" — "+indDep()+" "+E.telExp+"\n"+
+    "Destinataire : "+E.nomDest+" — "+indArr()+" "+E.telDest+"\n\n"+
+    "Liaison : "+L.dep+" → "+L.arr+" ("+L.mode+")\n"+
+    (bateau()?"Bateau":"Vol")+" : départ "+dTxt(v.dep)+" · arrivée "+dTxt(v.arr)+"\n"+
+    "Poids : "+E.poids+" kg\n"+
+    "Contenu : "+c.n+"\n"+
+    "Remise : "+remise+"\n"+
+    "Adresse de collecte : "+adr+"\n"+
+    "À l'arrivée : "+s.n+(s.id==="ret"?" — "+(RETRAITS[ville()]||""):"")+"\n\n"+
+    "Montant : "+fmt(E.total)+"\n"+
+    "Paiement : "+(MOYENS[E.moyen]||E.moyen||"");
+}
+function blocCommande(){
+  var t=recapTexte();
+  return '<div class="alerte" style="margin-top:0">Dernière étape : envoyez-nous votre commande. Sans cette confirmation, nous ne la recevons pas.</div>'+
+    '<a class="btn" style="background:#25a244" href="https://wa.me/'+WA+'?text='+encodeURIComponent(t)+'" target="_blank" rel="noopener">✅ Confirmer ma commande sur WhatsApp</a>'+
+    (CONFIG.email?'<p style="text-align:center;margin:10px 0 18px"><a style="color:var(--vert)" href="mailto:'+CONFIG.email+'?subject='+encodeURIComponent("Commande BABI SHIP "+E.num)+'&body='+encodeURIComponent(t)+'">Envoyer par e-mail</a></p>':'<div style="height:18px"></div>');
 }
 function terminer(moyen){
   var v=VOLS[Number(E.vol)],s=trouve(sorties(),E.sortie);
@@ -525,23 +581,56 @@ function terminer(moyen){
   var base=
     '<div class="bloc">🛬 Arrivée à notre centre '+deV(ville())+' le <b>'+dTxt(v.arr)+'</b></div>'+
     '<div class="bloc">'+s.i+' <b>'+s.n+'</b><br>'+(s.id==="ret"?adresseRetrait():(s.note?s.note:s.d))+'</div>'+
-    '<div class="bloc">💬 Le destinataire reçoit un lien WhatsApp au '+(versCI()?"+225":"+33")+' '+E.tel+'.</div>';
+    '<div class="bloc">👤 Destinataire : <b>'+att(E.nomDest)+'</b> · WhatsApp '+indArr()+' '+att(E.telDest)+'</div>';
   var liens=
-    '<button class="btn btn-2" onclick="aller(\'dest\')">Voir ce que reçoit le destinataire</button>'+
     '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
 
   if(moyen==="carte"){
     document.getElementById("confirm").innerHTML=
       '<h2 style="text-align:center">C\'est parti !</h2>'+
-      '<div class="bandeau-vert" style="text-align:center"><small>Votre numéro de suivi</small><span class="num">'+E.num+'</span><small>Paiement reçu · vol du '+dTxt(v.dep)+'</small></div>'+
-      base+'<button class="btn" onclick="aller(\'suivi\')">Suivre mon colis</button>'+liens;
+      '<div class="bandeau-vert" style="text-align:center"><small>Votre numéro de suivi</small><span class="num">'+E.num+'</span><small>Départ du '+dTxt(v.dep)+'</small></div>'+
+      blocCommande()+'<div class="attente-box">💳 Nous vous envoyons un lien de paiement sécurisé sur WhatsApp dès réception de votre commande.</div>'+base+'<button class="btn" onclick="aller(\'suivi\')">Suivre mon colis</button>'+liens;
+    aller("confirm");return;
+  }
+
+  var details;
+  if(moyen==="virement"||moyen==="paypal"){
+    var mt=fmt(E.total);
+    if(moyen==="virement") details=CONFIG.iban
+      ? '<div class="virement">'+
+          '<div class="vl"><span>Envoyer à</span><b>🏦 Virement bancaire</b></div>'+
+          '<div class="vl"><span>IBAN</span><b class="copiable" onclick="cop(this,\''+CONFIG.iban+'\')">'+CONFIG.iban+' ⧉</b></div>'+
+          (CONFIG.bic?'<div class="vl"><span>BIC</span><b>'+CONFIG.bic+'</b></div>':'')+
+          '<div class="vl"><span>Titulaire</span><b>'+CONFIG.titulaire+'</b></div>'+
+          '<div class="vl"><span>Montant exact</span><b>'+mt+'</b></div>'+
+          '<div class="vl ref"><span>Référence obligatoire</span><b class="copiable" onclick="cop(this,\''+E.num+'\')">'+E.num+' ⧉</b></div>'+
+        '</div>'
+      : '<div class="info">🏦 Nos coordonnées bancaires vous sont envoyées sur WhatsApp dès réception de votre commande. Montant : <b>'+mt+'</b> · référence obligatoire : <b>'+E.num+'</b></div>';
+    else details=CONFIG.paypal
+      ? '<div class="virement">'+
+          '<div class="vl"><span>Envoyer à</span><b>🅿️ PayPal</b></div>'+
+          '<div class="vl"><span>Compte PayPal</span><b>'+(/^https?:/.test(CONFIG.paypal)?'<a href="'+CONFIG.paypal+'" target="_blank" rel="noopener" style="color:var(--vert)">Payer avec PayPal</a>':CONFIG.paypal)+'</b></div>'+
+          '<div class="vl"><span>Montant exact</span><b>'+mt+'</b></div>'+
+          '<div class="vl ref"><span>Référence obligatoire</span><b>'+E.num+'</b></div>'+
+        '</div>'
+      : '<div class="info">🅿️ Notre lien PayPal vous est envoyé sur WhatsApp dès réception de votre commande. Montant : <b>'+mt+'</b> · référence : <b>'+E.num+'</b></div>';
+    document.getElementById("confirm").innerHTML=
+      '<h2>Votre commande '+E.num+'</h2>'+
+      blocCommande()+
+      '<div class="attente-box">⏳ <b>Paiement en attente</b><br>Votre colis ne partira qu\'une fois le paiement vérifié.</div>'+
+      details+
+      '<div class="alerte">⚠️ Indiquez <b>'+E.num+'</b> en référence du paiement. Sans cette référence, nous ne pourrons pas identifier votre paiement.</div>'+
+      '<button class="btn" onclick="declare()">J\'ai effectué le paiement</button>'+
+      '<p class="aide" style="text-align:center">Vérification sous 2 heures ouvrées. Vous serez prévenu sur WhatsApp.</p>'+
+      '<div style="height:20px"></div>'+base+liens;
     aller("confirm");return;
   }
 
   var c=COMPTES[moyen];
   var montant=fcfa(E.total);
   document.getElementById("confirm").innerHTML=
-    '<h2>Dernière étape : le virement</h2>'+
+    '<h2>Votre commande '+E.num+'</h2>'+
+    blocCommande()+
     '<div class="attente-box">⏳ <b>Paiement en attente</b><br>Votre colis ne partira qu\'une fois le virement vérifié.</div>'+
     '<div class="virement">'+
       '<div class="vl"><span>Envoyer à</span><b>'+c.i+' '+c.n+'</b></div>'+
@@ -564,32 +653,41 @@ function simuPhoto(el){el.querySelector(".nom").textContent="Capture jointe ✓"
 function declare(){
   var v=VOLS[Number(E.vol)];
   document.getElementById("confirm").innerHTML=
-    '<h2 style="text-align:center">Virement déclaré</h2>'+
+    '<h2 style="text-align:center">Paiement déclaré</h2>'+
     '<div class="bandeau-vert" style="text-align:center"><small>Votre numéro de suivi</small><span class="num">'+E.num+'</span><small>Paiement en cours de vérification</small></div>'+
-    '<div class="attente-box">⏳ Nous vérifions votre virement. Vous recevrez une confirmation sur WhatsApp sous 2 heures ouvrées. Votre place sur le vol du '+dTxt(v.dep)+' est réservée jusque-là.</div>'+
+    blocCommande()+
+    '<div class="attente-box">⏳ Nous vérifions votre paiement. Vous recevrez une confirmation sur WhatsApp sous 2 heures ouvrées. Votre place au départ du '+dTxt(v.dep)+' est réservée jusque-là.</div>'+
     '<button class="btn" onclick="aller(\'suivi\')">Suivre mon colis</button>'+
     '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
   window.scrollTo(0,0);
 }
 
-var avance=3;
 function rendreSuivi(){
-  var num=E.num||"BS-230755";
-  var v=(E.vol!==null&&VOLS.length)?VOLS[Number(E.vol)]:null;
-  if(!v){VOLS=vols();v=VOLS[1];}
-  var arr=dTxt(v.arr);
   var h='<h2>Suivi du colis</h2>'+
-    '<div class="bandeau-vert"><small>Numéro de suivi</small><span class="num">'+num+'</span><small>'+(E.sens?(versCI()?"France → Abidjan":"Abidjan → France"):"France → Abidjan")+' · arrivée prévue le '+arr+'</small></div>'+
-    '<a class="btn" href="https://wa.me/?text="+encodeURIComponent("Suivi de mon colis BABI SHIP : "+num)+"" target="_blank" rel="noopener">Partager sur WhatsApp</a>'+
-    '<button class="btn btn-2" onclick="copier(this)">Copier le numéro</button><ul class="tl">';
-  STATUTS.forEach(function(s,i){
-    h+='<li class="'+(i<avance?"ok":"")+'"><span class="rond">'+ICO[i]+'</span><span><b>'+s+'</b>'+(i<avance?'<span>Aujourd\'hui</span>':(i===4?'<span>Prévu le '+arr+'</span>':''))+'</span></li>';
-  });
-  h+='</ul><button class="btn btn-2" onclick="avancer()">▶ Faire avancer le colis (démo)</button><button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
+    '<label class="lab">Votre numéro de suivi (BS-XXXXXX)</label><input id="s-num" value="'+att(E.num||"")+'" placeholder="BS-XXXXXX" autocapitalize="characters" oninput="document.getElementById(\'btn-suivi\').disabled=this.value.trim().length<4">'+
+    '<button class="btn" id="btn-suivi" onclick="demanderSuivi()" '+(E.num?"":"disabled")+'>Demander mon suivi</button>'+
+    '<p class="aide">Nous vous répondons sur WhatsApp avec la position de votre colis.</p>'+
+    '<button class="btn btn-2" onclick="aller(\'accueil\')">Revenir à l\'accueil</button>';
   document.getElementById("suivi").innerHTML=h;
 }
-function avancer(){avance=avance>=STATUTS.length?1:avance+1;rendreSuivi();}
+function demanderSuivi(){
+  var n=val("s-num").trim().toUpperCase();if(!n)return;
+  window.open("https://wa.me/"+WA+"?text="+encodeURIComponent("Bonjour, je souhaite le suivi de mon colis "+n+"."),"_blank","noopener");
+}
 function copier(b){b.textContent="Numéro copié ✓";setTimeout(function(){b.textContent="Copier le numéro";},1800);}
+
+function rendreMentions(){
+  var C=CONFIG,h='<p>';
+  if(C.societe)h+='<b>Éditeur :</b> '+C.societe+(C.forme?', '+C.forme:'')+'<br>';
+  if(C.siret)h+='<b>SIRET :</b> '+C.siret+'<br>';
+  if(C.siege)h+='<b>Siège :</b> '+C.siege+'<br>';
+  if(C.directeur)h+='<b>Directeur de la publication :</b> '+C.directeur+'<br>';
+  h+='<b>Contact :</b> '+(C.email?'<a href="mailto:'+C.email+'" style="color:var(--vert)">'+C.email+'</a> · ':'')+'WhatsApp <a href="https://wa.me/'+WA+'" style="color:var(--vert)">+33 6 95 60 78 68</a></p>'+
+    '<p><b>Hébergeur :</b> Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis</p>'+
+    '<p><b>Données personnelles :</b> les données collectées (nom, téléphone, adresse) sont utilisées uniquement pour l\'exécution du transport et ne sont pas cédées à des tiers. Vous pouvez demander l\'accès à vos données ou leur suppression par simple message WhatsApp.</p>';
+  document.getElementById("mentions-txt").innerHTML=h;
+}
+rendreMentions();
 
 function rendreDest(){
   document.getElementById("dest").innerHTML=
